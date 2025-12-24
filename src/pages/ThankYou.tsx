@@ -44,18 +44,19 @@ const ThankYou = () => {
   const nextSteps = [
     {
       icon: Mail,
-      title: "Verifique seu e-mail",
-      description: "Enviamos seus dados de acesso para o e-mail cadastrado.",
+      title: "E-mail de Boas-Vindas Enviado",
+      description: "Você receberá: 'Bem-vindo à Mentoria ProFuturos 🚀 — Seu acesso foi liberado. Comece pelo módulo 1: Introdução aos Futuros.'",
     },
     {
       icon: TrendingUp,
       title: "Acesse a plataforma",
-      description: "Faça login na área do aluno para começar a estudar.",
+      description: "Faça login na área do aluno para começar a estudar agora mesmo.",
     },
     {
       icon: MessageCircle,
-      title: "Entre no grupo VIP",
-      description: "O link do Telegram está no seu e-mail de boas-vindas.",
+      title: "Entre no Grupo VIP do WhatsApp",
+      description: "Participe das discussões, tire dúvidas e conecte-se com outros traders.",
+      isWhatsApp: true,
     },
   ];
 
@@ -99,9 +100,20 @@ const ThankYou = () => {
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <step.icon className="w-5 h-5 text-primary" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-semibold text-foreground">{step.title}</h3>
                   <p className="text-sm text-muted-foreground">{step.description}</p>
+                  {step.isWhatsApp && (
+                    <a
+                      href="https://wa.me/5511999999999"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Acessar Grupo VIP 👉
+                    </a>
+                  )}
                 </div>
               </div>
             ))}

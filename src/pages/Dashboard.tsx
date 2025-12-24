@@ -10,6 +10,7 @@ import {
   Video,
   LogOut,
   GraduationCap,
+  MessageCircle,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
@@ -71,7 +72,7 @@ const Dashboard = () => {
   useEffect(() => {
     toast({
       title: "🎓 Bem-vindo(a)!",
-      description: "Comece pelo módulo 'Introdução aos Futuros'.",
+      description: "Aproveite o conteúdo e participe do grupo VIP.",
     });
   }, []);
 
@@ -133,6 +134,28 @@ const Dashboard = () => {
               : `Continue assim! Você está ${progress}% mais perto de dominar os futuros.`
             }
           </p>
+        </div>
+
+        {/* WhatsApp VIP Group */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-xl p-6 mb-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+              <MessageCircle className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Grupo VIP de Traders</h3>
+              <p className="text-sm text-muted-foreground">Participe das discussões e tire dúvidas em tempo real!</p>
+            </div>
+          </div>
+          <a
+            href="https://wa.me/5511999999999"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-full font-medium transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Acessar Grupo VIP
+          </a>
         </div>
 
         {/* Modules Grid */}
