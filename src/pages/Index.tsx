@@ -4,8 +4,6 @@ import { ArrowRight, Play, TrendingUp, Users, Award, Shield } from "lucide-react
 import heroImage from "@/assets/hero-trading.jpg";
 import mentorAvatar from "@/assets/mentor-avatar.jpg";
 import testimonial1 from "@/assets/testimonial-1.jpg";
-import testimonial2 from "@/assets/testimonial-2.jpg";
-import testimonial3 from "@/assets/testimonial-3.jpg";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -13,52 +11,40 @@ const Index = () => {
   const features = [
     {
       icon: TrendingUp,
-      title: "Estratégias Comprovadas",
-      description: "Aprenda técnicas testadas e aprovadas para operar futuros com consistência e segurança.",
+      title: "Estratégias simples e diretas",
+      description: "Métodos práticos e testados para você operar com clareza e confiança desde o início.",
+    },
+    {
+      icon: Play,
+      title: "Aulas gravadas e lives semanais",
+      description: "Conteúdo disponível 24h + encontros ao vivo para tirar dúvidas e analisar o mercado.",
     },
     {
       icon: Users,
-      title: "Comunidade Exclusiva",
-      description: "Faça parte de um grupo seleto de traders que compartilham conhecimento e experiências.",
-    },
-    {
-      icon: Award,
-      title: "Suporte Premium",
-      description: "Acesso direto ao mentor e suporte da equipe para tirar suas dúvidas em tempo real.",
+      title: "Grupo VIP de traders",
+      description: "Comunidade exclusiva para trocar ideias, setups e crescer junto com outros traders.",
     },
     {
       icon: Shield,
-      title: "Gestão de Risco",
-      description: "Domine as técnicas de gerenciamento de risco para proteger seu capital.",
+      title: "Suporte e acompanhamento",
+      description: "Mentoria de perto com suporte dedicado para acelerar sua evolução no mercado.",
     },
   ];
 
   const testimonials = [
     {
-      name: "Carla Mendes",
-      role: "Trader Profissional",
+      name: "Fernanda Souza",
+      role: "Trader desde 2023",
       image: testimonial1,
-      text: "Em 6 meses de mentoria, consegui sair do negativo e hoje opero com consistência. A metodologia do Rafael é incrível!",
-    },
-    {
-      name: "Roberto Silva",
-      role: "Empresário",
-      image: testimonial2,
-      text: "Nunca imaginei que conseguiria operar futuros. A mentoria me deu a confiança e o conhecimento necessário.",
-    },
-    {
-      name: "Lucas Oliveira",
-      role: "Desenvolvedor",
-      image: testimonial3,
-      text: "O suporte é excepcional. Sempre que tenho dúvidas, recebo respostas rápidas e precisas. Recomendo demais!",
+      text: "Comecei do zero e em poucos meses já estava operando com consistência. A didática é incrível!",
     },
   ];
 
   const stats = [
-    { value: "2.500+", label: "Alunos" },
-    { value: "R$ 15M+", label: "Lucro Gerado" },
-    { value: "98%", label: "Satisfação" },
-    { value: "4 Anos", label: "No Mercado" },
+    { value: "1.200+", label: "Alunos" },
+    { value: "R$ 5M+", label: "Lucro Gerado" },
+    { value: "97%", label: "Satisfação" },
+    { value: "3 Anos", label: "No Mercado" },
   ];
 
   return (
@@ -84,29 +70,25 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-up">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm text-primary font-medium">Vagas Limitadas para 2024</span>
+              <span className="text-sm text-primary font-medium">Vagas Limitadas — Inscreva-se Agora</span>
             </div>
 
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-              Domine o Mercado de{" "}
-              <span className="text-gradient">Futuros</span> na Binance
+              Aprenda a operar futuros na Binance com{" "}
+              <span className="text-gradient">segurança e consistência</span>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-              A mentoria definitiva para você aprender a operar contratos futuros com estratégias comprovadas e conquistar sua liberdade financeira.
+              Transforme conhecimento em lucro com a mentoria ProFuturos.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
               <Link to="/mentoria">
                 <Button variant="hero" size="xl">
-                  Quero Começar Agora
+                  Quero começar agora
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <Button variant="heroOutline" size="xl">
-                <Play className="w-5 h-5" />
-                Ver Aula Grátis
-              </Button>
             </div>
 
             {/* Trust Badges */}
@@ -127,10 +109,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Por Que Escolher a <span className="text-primary">ProFuturos</span>?
+              Por que escolher a <span className="text-primary">ProFuturos</span>?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Nossa metodologia foi desenvolvida para transformar iniciantes em traders consistentes e lucrativos.
+              Aqui você não encontra promessas vazias. Nossa metodologia é baseada em anos de experiência real no mercado de futuros. Com acompanhamento próximo, conteúdo didático e uma comunidade ativa, você terá tudo o que precisa para operar com segurança e construir resultados de verdade.
             </p>
           </div>
 
@@ -204,34 +186,31 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              O Que Nossos <span className="text-primary">Alunos</span> Dizem
+              O que nossos <span className="text-primary">alunos</span> dizem
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Histórias reais de pessoas que transformaram suas vidas através da nossa mentoria.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="max-w-2xl mx-auto">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="p-6 rounded-xl bg-gradient-card border border-border/50 hover:border-primary/30 transition-all"
+                className="p-8 rounded-xl bg-gradient-card border border-border/50 hover:border-primary/30 transition-all"
               >
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-4 mb-6">
                   <img
                     src={testimonial.image}
                     alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-16 h-16 rounded-full object-cover"
                   />
                   <div>
-                    <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                    <h4 className="font-semibold text-foreground text-lg">{testimonial.name}</h4>
                     <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-muted-foreground leading-relaxed">"{testimonial.text}"</p>
-                <div className="flex gap-1 mt-4">
+                <p className="text-muted-foreground leading-relaxed text-lg">"{testimonial.text}"</p>
+                <div className="flex gap-1 mt-6">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
