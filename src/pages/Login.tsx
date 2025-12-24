@@ -7,35 +7,28 @@ import { TrendingUp, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isLogin) {
-      // Simulate login
-      if (email && password) {
-        toast({
-          title: "Login realizado!",
-          description: "Bem-vindo de volta à ProFuturos Academy.",
-        });
-        navigate("/dashboard");
-      }
-    } else {
-      // Simulate registration
-      if (email && password && name) {
-        toast({
-          title: "Conta criada!",
-          description: "Sua conta foi criada com sucesso.",
-        });
-        navigate("/dashboard");
-      }
+    // Demo credentials check
+    if (email === "demo@profuturos.com" && password === "demo123") {
+      toast({
+        title: "Login realizado!",
+        description: "Bem-vindo de volta à ProFuturos Academy.",
+      });
+      navigate("/dashboard");
+    } else if (email && password) {
+      toast({
+        title: "Credenciais inválidas",
+        description: "Use: demo@profuturos.com / demo123",
+        variant: "destructive",
+      });
     }
   };
 
@@ -62,32 +55,14 @@ const Login = () => {
         <div className="bg-card border border-border rounded-2xl p-8 shadow-[0_4px_24px_hsl(0_0%_0%/0.3)]">
           <div className="text-center mb-8">
             <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-              {isLogin ? "Área do Aluno" : "Criar Conta"}
+              Área do Aluno
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isLogin
-                ? "Entre para acessar seu conteúdo exclusivo"
-                : "Crie sua conta para começar a aprender"}
+              Faça login para acessar suas aulas e materiais exclusivos.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">
-                  Nome Completo
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Seu nome"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-secondary border-border focus:border-primary"
-                />
-              </div>
-            )}
-
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
                 E-mail
@@ -129,29 +104,24 @@ const Login = () => {
               </div>
             </div>
 
-            {isLogin && (
-              <div className="text-right">
-                <a href="#" className="text-sm text-primary hover:underline">
-                  Esqueci minha senha
-                </a>
-              </div>
-            )}
+            <div className="text-right">
+              <a href="#" className="text-sm text-primary hover:underline">
+                Esqueci minha senha
+              </a>
+            </div>
 
             <Button type="submit" variant="hero" className="w-full" size="lg">
-              {isLogin ? "Entrar" : "Criar Conta"}
+              Entrar
               <ArrowRight className="w-4 h-4" />
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-muted-foreground text-sm">
-              {isLogin ? "Ainda não tem conta?" : "Já tem uma conta?"}{" "}
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-primary hover:underline font-medium"
-              >
-                {isLogin ? "Criar conta" : "Fazer login"}
-              </button>
+          {/* Demo Credentials */}
+          <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <p className="text-sm text-center text-muted-foreground">
+              <span className="font-semibold text-foreground">Credenciais de demonstração:</span>
+              <br />
+              demo@profuturos.com / demo123
             </p>
           </div>
         </div>
