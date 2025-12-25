@@ -1,76 +1,125 @@
-import { Star } from "lucide-react";
-import testimonial1 from "@/Imagens/testimonial-1.jpg";
+import { useEffect, useState, useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const testimonials = [
-  {
-    name: "Fernanda Souza",
-    role: "Iniciante em cripto",
-    image: testimonial1,
-    text:
-      "Eu não entendia nada de mercado futuro e tinha muito medo de perder dinheiro. A mentoria me deu clareza, disciplina e hoje consigo operar com muito mais segurança.",
-  },
-  {
-    name: "Carlos Henrique",
-    role: "Renda extra com cripto",
-    image: testimonial1,
-    text:
-      "O maior diferencial foi a gestão de risco e o acompanhamento. Não é promessa de dinheiro fácil, é método real. Isso mudou totalmente minha forma de operar.",
-  },
+import fb1 from "@/Imagens/Feedback aluno.jpeg";
+import fb2 from "@/Imagens/Feedback aluno 2.jpeg";
+import fb3 from "@/Imagens/Feedback aluno 3.jpeg";
+import fb4 from "@/Imagens/Feedback aluno 4.jpeg";
+import fb5 from "@/Imagens/Feedback aluno 5.jpeg";
+import fb6 from "@/Imagens/Feedback aluno 6.jpeg";
+import fb7 from "@/Imagens/Feedback aluno 7.jpeg";
+import fb8 from "@/Imagens/Feedback aluno 8.jpeg";
+import fb9 from "@/Imagens/Feedback aluno 9.jpeg";
+import fb10 from "@/Imagens/Feedback aluno 10.jpeg";
+import fb11 from "@/Imagens/Feedback aluno 11.jpeg";
+import fb12 from "@/Imagens/Feedback aluno 12.jpeg";
+
+const images = [
+  fb1, fb2, fb3, fb4, fb5, fb6,
+  fb7, fb8, fb9, fb10, fb11, fb12,
 ];
 
 const Testimonials = () => {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const getVisibleCount = () => {
+    if (window.innerWidth >= 1024) return 3;
+    if (window.innerWidth >= 640) return 2;
+    return 1;
+  };
+
+  const [visibleCount, setVisibleCount] = useState(getVisibleCount());
+
+  useEffect(() => {
+    const handleResize = () => setVisibleCount(getVisibleCount());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (paused) return;
+
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [paused]);
+
+  const next = () => {
+    setIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = () => {
+    setIndex((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  const visibleImages = images
+    .slice(index, index + visibleCount)
+    .concat(
+      images.slice(0, Math.max(0, index + visibleCount - images.length))
+    );
+
   return (
-    <section className="py-20 md:py-32 bg-card/50">
+    <section className="py-20 md:py-32 bg-card/50 overflow-hidden">
       <div className="container mx-auto px-4">
+
         {/* Título */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             O que nossos <span className="text-primary">alunos dizem</span>
           </h2>
           <p className="text-muted-foreground text-lg">
-            Pessoas reais, resultados reais. Sem promessas milagrosas.
+            Pessoas reais. Mensagens reais. Sem promessas milagrosas.
           </p>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {testimonials.map((testimonial, index) => (
+        {/* Slider */}
+        <div
+          ref={containerRef}
+          className="relative flex items-center justify-center gap-6"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          {/* Botão esquerda */}
+          <button
+            onClick={prev}
+            className="absolute left-0 z-10 p-2 rounded-full bg-background/80 border border-border hover:border-primary transition"
+          >
+            <ChevronLeft className="w-6 h-6 text-foreground" />
+          </button>
+
+          {/* Cards */}
+          {visibleImages.map((img, i) => (
             <div
-              key={index}
-              className="p-8 rounded-xl bg-gradient-card border border-border/50 hover:border-primary/30 transition-all"
+              key={i}
+              className="w-full max-w-sm rounded-xl overflow-hidden border border-border bg-background shadow-card"
             >
-              <div className="flex items-center gap-4 mb-6">
+              {/* ALTURA PADRÃO AQUI */}
+              <div className="h-[420px] flex items-center justify-center bg-background">
                 <img
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  className="w-16 h-16 rounded-full object-cover"
+                  src={img}
+                  alt="Feedback real de aluno no WhatsApp"
+                  className="max-h-full max-w-full object-contain"
+                  loading="lazy"
                 />
-                <div>
-                  <h4 className="font-semibold text-foreground">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {testimonial.role}
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                “{testimonial.text}”
-              </p>
-
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5 text-primary"
-                    fill="currentColor"
-                  />
-                ))}
               </div>
             </div>
           ))}
+
+          {/* Botão direita */}
+          <button
+            onClick={next}
+            className="absolute right-0 z-10 p-2 rounded-full bg-background/80 border border-border hover:border-primary transition"
+          >
+            <ChevronRight className="w-6 h-6 text-foreground" />
+          </button>
         </div>
+
       </div>
     </section>
   );

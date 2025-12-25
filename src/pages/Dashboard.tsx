@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import {
   TrendingUp,
   Play,
@@ -11,7 +10,9 @@ import {
   LogOut,
   GraduationCap,
   MessageCircle,
+  Lock,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,73 +24,79 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  // 🔹 Módulos (cenário)
   const modules = [
     {
       id: 1,
       title: "Introdução aos Futuros",
-      description: "Aprenda os fundamentos do mercado de futuros e como a Binance funciona.",
+      description: "Fundamentos do mercado futuro e como a Binance funciona.",
       icon: BookOpen,
-      thumbnail: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=225&fit=crop",
-      videoUrl: "#",
-      completed: false,
+      thumbnail:
+        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400",
+      videoUrl: null, // depois só colocar o link
+      locked: false,
     },
     {
       id: 2,
       title: "Estratégias e Setups",
-      description: "Descubra os melhores setups de entrada e saída para maximizar seus ganhos.",
+      description: "Setups práticos de entrada e saída.",
       icon: TrendingUp,
-      thumbnail: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400&h=225&fit=crop",
-      videoUrl: "#",
-      completed: false,
+      thumbnail:
+        "https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400",
+      videoUrl: null,
+      locked: true,
     },
     {
       id: 3,
       title: "Gestão de Risco",
-      description: "Proteja seu capital com técnicas profissionais de gestão de risco.",
+      description: "Proteção de capital e controle emocional.",
       icon: ShieldCheck,
-      thumbnail: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=225&fit=crop",
-      videoUrl: "#",
-      completed: false,
+      thumbnail:
+        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400",
+      videoUrl: null,
+      locked: true,
     },
     {
       id: 4,
       title: "Psicologia do Trader",
-      description: "Domine suas emoções e desenvolva a mentalidade de um trader consistente.",
+      description: "Mentalidade para consistência no mercado.",
       icon: Brain,
-      thumbnail: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400&h=225&fit=crop",
-      videoUrl: "#",
-      completed: false,
+      thumbnail:
+        "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400",
+      videoUrl: null,
+      locked: true,
     },
     {
       id: 5,
       title: "Operações ao Vivo",
-      description: "Acompanhe operações reais e aprenda na prática com o mentor.",
+      description: "Acompanhamento prático de operações reais.",
       icon: Video,
-      thumbnail: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=225&fit=crop",
-      videoUrl: "#",
-      completed: false,
+      thumbnail:
+        "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400",
+      videoUrl: null,
+      locked: true,
     },
   ];
 
-  // Show welcome toast on mount
+  // Toast de boas-vindas
   useEffect(() => {
     const userName = user?.user_metadata?.full_name || "Aluno";
     toast({
       title: `🎓 Bem-vindo(a), ${userName}!`,
-      description: "Aproveite o conteúdo e participe do grupo VIP.",
+      description: "Seu acesso foi liberado. Comece pelo primeiro módulo.",
     });
   }, []);
 
-  // Simulated progress
+  // Progresso (cenário)
   useEffect(() => {
-    const completedModules = modules.filter(m => m.completed).length;
-    setProgress((completedModules / modules.length) * 100);
-  }, [modules]);
+    const completed = modules.filter((m) => !m.locked).length;
+    setProgress(Math.round((completed / modules.length) * 100));
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
     toast({
-      title: "Até logo!",
+      title: "Sessão encerrada",
       description: "Você saiu da sua conta com sucesso.",
     });
     navigate("/login");
@@ -98,13 +105,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
+      <header className="border-b border-border bg-card/50 backdrop-blur sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-primary-foreground" />
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-display font-bold text-lg text-foreground">
+            <span className="font-display font-bold">
               Pro<span className="text-primary">Futuros</span>
             </span>
           </Link>
@@ -115,7 +122,7 @@ const Dashboard = () => {
             </span>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
               <LogOut className="w-4 h-4" />
               <span className="text-sm">Sair</span>
@@ -124,133 +131,124 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 lg:px-8 py-8 lg:py-12">
-        {/* Welcome Section */}
+      {/* Main */}
+      <main className="container mx-auto px-4 py-10">
+        {/* Welcome */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <GraduationCap className="w-8 h-8 text-primary" />
-            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
-              Bem-vindo à sua área de aprendizado
+            <h1 className="text-2xl md:text-3xl font-bold">
+              Área do Aluno
             </h1>
           </div>
-          <p className="text-muted-foreground text-lg">
-            Continue sua jornada rumo à consistência nos Futuros
+          <p className="text-muted-foreground">
+            Trilha guiada para aprender a operar com clareza e responsabilidade.
           </p>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress */}
         <div className="bg-card border border-border rounded-xl p-6 mb-10">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-foreground font-medium">Seu progresso</span>
+          <div className="flex justify-between mb-2">
+            <span className="font-medium">Progresso da trilha</span>
             <span className="text-primary font-semibold">{progress}%</span>
           </div>
           <Progress value={progress} className="h-3" />
           <p className="text-sm text-muted-foreground mt-3">
-            {progress === 0 
-              ? "Comece sua jornada assistindo ao primeiro módulo!"
-              : `Continue assim! Você está ${progress}% mais perto de dominar os futuros.`
-            }
+            Conteúdo liberado gradualmente para garantir melhor aprendizado.
           </p>
         </div>
 
-        {/* WhatsApp VIP Group */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-xl p-6 mb-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Grupo VIP */}
+        <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-primary" />
-            </div>
+            <MessageCircle className="w-6 h-6 text-primary" />
             <div>
-              <h3 className="font-semibold text-foreground">Grupo VIP de Traders</h3>
-              <p className="text-sm text-muted-foreground">Participe das discussões e tire dúvidas em tempo real!</p>
+              <h3 className="font-semibold">Grupo VIP de Alunos</h3>
+              <p className="text-sm text-muted-foreground">
+                Dúvidas, análises e acompanhamento.
+              </p>
             </div>
           </div>
           <a
             href="https://wa.me/5511999999999"
             target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-full font-medium transition-colors"
+            rel="noreferrer"
+            className="bg-primary text-primary-foreground px-5 py-2.5 rounded-full font-medium"
           >
-            <MessageCircle className="w-4 h-4" />
-            Acessar Grupo VIP
+            Acessar grupo
           </a>
         </div>
 
-        {/* Modules Grid */}
+        {/* Módulos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map((module) => (
             <div
               key={module.id}
-              onClick={() => setSelectedModule(module.id)}
-              className="group bg-card border border-border rounded-xl overflow-hidden cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-[0_4px_20px_hsl(153_100%_39%/0.15)]"
+              onClick={() => {
+                if (module.locked) {
+                  toast({
+                    title: "Conteúdo em breve",
+                    description:
+                      "Esse módulo será liberado nos próximos dias.",
+                  });
+                } else {
+                  setSelectedModule(module.id);
+                }
+              }}
+              className="relative bg-card border border-border rounded-xl overflow-hidden cursor-pointer hover:border-primary/50 transition"
             >
-              {/* Thumbnail */}
-              <div className="relative aspect-video overflow-hidden">
+              {module.locked && (
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Lock className="w-4 h-4" />
+                    Em breve
+                  </div>
+                </div>
+              )}
+
+              <div className="aspect-video overflow-hidden">
                 <img
                   src={module.thumbnail}
                   alt={module.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_4px_20px_hsl(153_100%_39%/0.4)]">
-                    <Play className="w-6 h-6 text-primary-foreground ml-1" />
-                  </div>
-                </div>
-                <div className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-foreground">
-                  Módulo {module.id}
-                </div>
               </div>
 
-              {/* Content */}
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <module.icon className="w-5 h-5 text-primary" />
-                  <h3 className="font-display font-semibold text-foreground">
-                    {module.title}
-                  </h3>
+                  <h3 className="font-semibold">{module.title}</h3>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground">
                   {module.description}
                 </p>
-                <Button variant="link" className="p-0 h-auto mt-3 text-primary">
-                  Assistir aulas →
-                </Button>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Video Modal Placeholder */}
+        {/* Modal de vídeo (placeholder premium) */}
         {selectedModule && (
-          <div 
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          <div
+            className="fixed inset-0 bg-background/80 backdrop-blur z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedModule(null)}
           >
-            <div 
+            <div
               className="bg-card border border-border rounded-2xl w-full max-w-4xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="aspect-video bg-secondary flex items-center justify-center relative">
-                <div className="text-center">
-                  <Play className="w-16 h-16 text-primary mx-auto mb-4" />
-                  <p className="text-foreground font-medium">
-                    Vídeo do {modules.find(m => m.id === selectedModule)?.title}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    (Placeholder - Integre seu player de vídeo aqui)
-                  </p>
-                </div>
+              <div className="aspect-video flex flex-col items-center justify-center text-center p-8 bg-secondary">
+                <Video className="w-16 h-16 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">
+                  Conteúdo em produção
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  As aulas deste módulo estão sendo preparadas com foco em clareza,
+                  responsabilidade e aplicação prática.
+                </p>
               </div>
-              <div className="p-6 flex justify-between items-center">
-                <div>
-                  <h3 className="font-display font-semibold text-foreground">
-                    {modules.find(m => m.id === selectedModule)?.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {modules.find(m => m.id === selectedModule)?.description}
-                  </p>
-                </div>
+
+              <div className="p-6 flex justify-end">
                 <Button variant="outline" onClick={() => setSelectedModule(null)}>
                   Fechar
                 </Button>
