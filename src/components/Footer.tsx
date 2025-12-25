@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import {  Instagram, Youtube, MessageCircle } from "lucide-react";
+import { Instagram, Youtube, MessageCircle } from "lucide-react";
 import Logo from "@/components/Logo";
 
 const Footer = () => {
@@ -10,35 +10,50 @@ const Footer = () => {
           {/* Logo & Description */}
           <div className="md:col-span-1">
             <div className="mb-4">
-  <Logo size="md" />
-</div>
+              <Logo size="md" />
+            </div>
 
             <p className="text-muted-foreground text-sm leading-relaxed">
-              A mentoria definitiva para você dominar o mercado de futuros na Binance e conquistar sua liberdade financeira.
+              A mentoria definitiva para você dominar o mercado de futuros na
+              Binance e conquistar sua liberdade financeira.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Links</h4>
+            <h4 className="font-display font-semibold text-foreground mb-4">
+              Links
+            </h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   Início
                 </Link>
               </li>
               <li>
-                <Link to="/mentoria" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/mentoria"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   Mentoria
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/faq"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/contato" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/faq#contato"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   Contato
                 </Link>
               </li>
@@ -47,20 +62,31 @@ const Footer = () => {
 
           {/* Suporte */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Suporte</h4>
+            <h4 className="font-display font-semibold text-foreground mb-4">
+              Suporte
+            </h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/login" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/login"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   Área do Aluno
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/faq"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   Perguntas Frequentes
                 </Link>
               </li>
               <li>
-                <Link to="/contato" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/faq#contato"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
                   Fale Conosco
                 </Link>
               </li>
@@ -69,22 +95,35 @@ const Footer = () => {
 
           {/* Social */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Redes Sociais</h4>
+            <h4 className="font-display font-semibold text-foreground mb-4">
+              Redes Sociais
+            </h4>
             <div className="flex gap-4">
               <a
-                href="#"
+                href="https://www.instagram.com/julia.jfn/?hl=pt-br"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
                 className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
               >
                 <Instagram className="w-5 h-5" />
               </a>
+
               <a
-                href="#"
+                href="https://www.youtube.com/@JuliaJfn"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
                 className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
               >
                 <Youtube className="w-5 h-5" />
               </a>
+
               <a
-                href="#"
+                href="https://wa.me/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
                 className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
               >
                 <MessageCircle className="w-5 h-5" />
@@ -93,16 +132,23 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-muted-foreground text-sm">
               © 2025 JFN Trading. Todos os direitos reservados.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
                 Termos de Uso
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
                 Política de Privacidade
               </a>
             </div>

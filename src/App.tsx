@@ -24,13 +24,17 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+
       <BrowserRouter>
+        {/* ✅ RESPONSÁVEL PELO SCROLL */}
         <ScrollToTop />
+
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/login" element={<Login />} />
+
             <Route
               path="/dashboard"
               element={
@@ -39,11 +43,16 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/obrigado" element={<ThankYou />} />
             <Route path="/faq" element={<FAQ />} />
+
+            {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+
+          {/* Bot flutuante */}
           <ProBot />
         </AuthProvider>
       </BrowserRouter>
