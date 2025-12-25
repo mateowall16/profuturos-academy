@@ -44,7 +44,7 @@ const Index = () => {
     { value: "300+", label: "Alunos" },
     { value: "R$ 100k+", label: "Lucro Gerado" },
     { value: "97%", label: "Satisfação" },
-    { value: "1 Anos", label: "No Mercado" },
+    { value: "1 Ano", label: "No Mercado" },
   ];
 
   return (
