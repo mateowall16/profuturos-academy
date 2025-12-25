@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   TrendingUp,
@@ -14,11 +14,14 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Dashboard = () => {
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const modules = [
     {
@@ -70,8 +73,9 @@ const Dashboard = () => {
 
   // Show welcome toast on mount
   useEffect(() => {
+    const userName = user?.user_metadata?.full_name || "Aluno";
     toast({
-      title: "🎓 Bem-vindo(a)!",
+      title: `🎓 Bem-vindo(a), ${userName}!`,
       description: "Aproveite o conteúdo e participe do grupo VIP.",
     });
   }, []);
@@ -81,6 +85,15 @@ const Dashboard = () => {
     const completedModules = modules.filter(m => m.completed).length;
     setProgress((completedModules / modules.length) * 100);
   }, [modules]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Até logo!",
+      description: "Você saiu da sua conta com sucesso.",
+    });
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -96,13 +109,18 @@ const Dashboard = () => {
             </span>
           </Link>
 
-          <Link
-            to="/login"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm">Sair</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground hidden sm:block">
+              {user?.email}
+            </span>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm">Sair</span>
+            </button>
+          </div>
         </div>
       </header>
 
