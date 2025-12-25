@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, Play, Shield, Clock, Users, BookOpen, MessageCircle, Video, Award } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/hero-trading.jpg";
+import heroImage from "@/Imagens/hero-trading.jpg";
 
 const Mentoria = () => {
   const modules = [

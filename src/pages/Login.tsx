@@ -69,7 +69,7 @@ const Login = () => {
         } else {
           toast({
             title: "Conta criada!",
-            description: "Bem-vindo à ProFuturos Academy.",
+            description: "Bem-vindo à JFN Trading Academy.",
           });
           navigate("/dashboard");
         }
@@ -84,7 +84,7 @@ const Login = () => {
         } else {
           toast({
             title: "Login realizado!",
-            description: "Bem-vindo de volta à ProFuturos Academy.",
+            description: "Bem-vindo de volta à JFN Trading Academy.",
           });
           navigate("/dashboard");
         }

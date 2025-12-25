@@ -164,7 +164,7 @@ const FAQ = () => {
 
             <p className="text-center text-muted-foreground mt-8">
               <Mail className="w-4 h-4 inline mr-2" />
-              contato@profuturos.com
+              contato@JFN Trading.com
             </p>
           </div>
         </div>

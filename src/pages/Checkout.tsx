@@ -73,7 +73,7 @@ const Checkout = () => {
                   <TrendingUp className="w-8 h-8 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">Mentoria ProFuturos Academy</h3>
+                  <h3 className="font-semibold text-foreground">Mentoria JFN Trading </h3>
                   <p className="text-sm text-muted-foreground">Acesso vitalício</p>
                 </div>
               </div>

@@ -84,7 +84,7 @@ const ProBot = () => {
             </div>
             <div>
               <h3 className="font-bold">ProBot</h3>
-              <p className="text-xs opacity-80">Assistente ProFuturos</p>
+              <p className="text-xs opacity-80">Assistente JFN Trading</p>
             </div>
           </div>
 

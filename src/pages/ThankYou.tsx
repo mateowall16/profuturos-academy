@@ -45,7 +45,7 @@ const ThankYou = () => {
     {
       icon: Mail,
       title: "E-mail de Boas-Vindas Enviado",
-      description: "Você receberá: 'Bem-vindo à Mentoria ProFuturos 🚀 — Seu acesso foi liberado. Comece pelo módulo 1: Introdução aos Futuros.'",
+      description: "Você receberá: 'Bem-vindo à Mentoria JFN Trading 🚀 — Seu acesso foi liberado. Comece pelo módulo 1: Introdução aos Futuros.'",
     },
     {
       icon: TrendingUp,
@@ -133,8 +133,8 @@ const ThankYou = () => {
         {/* Support */}
         <p className="text-sm text-muted-foreground mt-8 animate-fade-up" style={{ animationDelay: "0.4s" }}>
           Dúvidas? Entre em contato:{" "}
-          <a href="mailto:suporte@profuturos.com.br" className="text-primary hover:underline">
-            suporte@profuturos.com.br
+          <a href="mailto:suporte@JFN Trading.com.br" className="text-primary hover:underline">
+            suporte@JFN Trading.com.br
           </a>
         </p>
       </div>

@@ -74,12 +74,16 @@ const Index = () => {
             </div>
 
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-              Aprenda a operar futuros na Binance com{" "}
-              <span className="text-gradient">segurança e consistência</span>
+              Aprenda a {" "}  
+              <span className="text-gradient">Investir </span>
+              e {" "}  
+              <span className="text-gradient">Operar </span>
+              Criptomoedas de Forma {" "}
+              <span className="text-gradient">Descomplicada </span> 
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-              Transforme conhecimento em lucro com a mentoria ProFuturos.
+              Método prático, gestão de risco e rotina que cabe no seu dia. Aprenda a operar com clareza e disciplina.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
@@ -109,7 +113,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Por que escolher a <span className="text-primary">ProFuturos</span>?
+              Por que escolher a <span className="text-primary">JFN Trading</span>?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Aqui você não encontra promessas vazias. Nossa metodologia é baseada em anos de experiência real no mercado de futuros. Com acompanhamento próximo, conteúdo didático e uma comunidade ativa, você terá tudo o que precisa para operar com segurança e construir resultados de verdade.
