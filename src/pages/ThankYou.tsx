@@ -78,11 +78,11 @@ const ThankYou = () => {
 
         {/* Message */}
         <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4 animate-fade-up">
-          Parabéns! Você está <span className="text-primary">dentro!</span>
+          Parabéns! Você garantiu seu acesso <span className="text-primary">🎉</span>
         </h1>
 
         <p className="text-lg text-muted-foreground mb-8 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-          Sua compra foi confirmada com sucesso. Bem-vindo à família ProFuturos Academy!
+          Seu acesso à Mentoria Binance Pro foi confirmado. Verifique seu e-mail com os detalhes e comece pelo módulo 1.
         </p>
 
         {/* Next Steps */}
@@ -124,13 +124,8 @@ const ThankYou = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
           <Link to="/dashboard">
             <Button variant="hero" size="xl">
-              Acessar Área do Aluno
+              Ir para área do aluno
               <ArrowRight className="w-5 h-5" />
-            </Button>
-          </Link>
-          <Link to="/">
-            <Button variant="outline" size="xl">
-              Voltar ao Início
             </Button>
           </Link>
         </div>
