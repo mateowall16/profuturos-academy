@@ -1,43 +1,40 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import fb1 from "@/Imagens/Feedback aluno.jpeg";
-import fb2 from "@/Imagens/Feedback aluno 2.jpeg";
-import fb3 from "@/Imagens/Feedback aluno 3.jpeg";
-import fb4 from "@/Imagens/Feedback aluno 4.jpeg";
-import fb5 from "@/Imagens/Feedback aluno 5.jpeg";
-import fb6 from "@/Imagens/Feedback aluno 6.jpeg";
-import fb7 from "@/Imagens/Feedback aluno 7.jpeg";
-import fb8 from "@/Imagens/Feedback aluno 8.jpeg";
-import fb9 from "@/Imagens/Feedback aluno 9.jpeg";
-import fb10 from "@/Imagens/Feedback aluno 10.jpeg";
-import fb11 from "@/Imagens/Feedback aluno 11.jpeg";
-import fb12 from "@/Imagens/Feedback aluno 12.jpeg";
-
 const images = [
-  fb1, fb2, fb3, fb4, fb5, fb6,
-  fb7, fb8, fb9, fb10, fb11, fb12,
+  "/feedbacks/Feedback-1.jpeg",
+  "/feedbacks/Feedback-2.jpeg",
+  "/feedbacks/Feedback-3.jpeg",
+  "/feedbacks/Feedback-4.jpeg",
+  "/feedbacks/Feedback-5.jpeg",
+  "/feedbacks/Feedback-6.jpeg",
+  "/feedbacks/Feedback-7.jpeg",
+  "/feedbacks/Feedback-8.jpeg",
+  "/feedbacks/Feedback-9.jpeg",
+  "/feedbacks/Feedback-10.jpeg",
+  "/feedbacks/Feedback-11.jpeg",
+  "/feedbacks/Feedback-12.jpeg",
 ];
 
 const Testimonials = () => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(3);
 
-  const getVisibleCount = () => {
-    if (window.innerWidth >= 1024) return 3;
-    if (window.innerWidth >= 640) return 2;
-    return 1;
-  };
-
-  const [visibleCount, setVisibleCount] = useState(getVisibleCount());
-
+  // Responsividade
   useEffect(() => {
-    const handleResize = () => setVisibleCount(getVisibleCount());
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const updateVisibleCount = () => {
+      if (window.innerWidth >= 1024) setVisibleCount(3);
+      else if (window.innerWidth >= 640) setVisibleCount(2);
+      else setVisibleCount(1);
+    };
+
+    updateVisibleCount();
+    window.addEventListener("resize", updateVisibleCount);
+    return () => window.removeEventListener("resize", updateVisibleCount);
   }, []);
 
+  // Autoplay
   useEffect(() => {
     if (paused) return;
 
@@ -53,21 +50,21 @@ const Testimonials = () => {
   };
 
   const prev = () => {
-    setIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+    setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   const visibleImages = images
     .slice(index, index + visibleCount)
     .concat(
-      images.slice(0, Math.max(0, index + visibleCount - images.length))
+      images.slice(
+        0,
+        Math.max(0, index + visibleCount - images.length)
+      )
     );
 
   return (
     <section className="py-20 md:py-32 bg-card/50 overflow-hidden">
       <div className="container mx-auto px-4">
-
         {/* Título */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -80,7 +77,6 @@ const Testimonials = () => {
 
         {/* Slider */}
         <div
-          ref={containerRef}
           className="relative flex items-center justify-center gap-6"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
@@ -89,6 +85,7 @@ const Testimonials = () => {
           <button
             onClick={prev}
             className="absolute left-0 z-10 p-2 rounded-full bg-background/80 border border-border hover:border-primary transition"
+            aria-label="Anterior"
           >
             <ChevronLeft className="w-6 h-6 text-foreground" />
           </button>
@@ -99,13 +96,16 @@ const Testimonials = () => {
               key={i}
               className="w-full max-w-sm rounded-xl overflow-hidden border border-border bg-background shadow-card"
             >
-              {/* ALTURA PADRÃO AQUI */}
+              {/* Altura padrão */}
               <div className="h-[420px] flex items-center justify-center bg-background">
                 <img
                   src={img}
                   alt="Feedback real de aluno no WhatsApp"
                   className="max-h-full max-w-full object-contain"
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = "/feedbacks/placeholder.jpeg";
+                  }}
                 />
               </div>
             </div>
@@ -115,11 +115,11 @@ const Testimonials = () => {
           <button
             onClick={next}
             className="absolute right-0 z-10 p-2 rounded-full bg-background/80 border border-border hover:border-primary transition"
+            aria-label="Próximo"
           >
             <ChevronRight className="w-6 h-6 text-foreground" />
           </button>
         </div>
-
       </div>
     </section>
   );
