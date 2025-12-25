@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, TrendingUp, Users, Award, Shield } from "lucide-react";
-import heroImage from "@/assets/hero-trading.jpg";
-import mentorAvatar from "@//assets/mentor-avatar.jpg.jpeg";
-import testimonial1 from "@/assets/testimonial-1.jpg";
+import heroImage from "@/Imagens/hero-trading.jpg";
+import mentorAvatar from "@//Imagens/mentor-avatar.jpg.jpeg";
+import testimonial1 from "@/Imagens/testimonial-1.jpg";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
