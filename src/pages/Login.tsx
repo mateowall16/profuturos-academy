@@ -1,36 +1,112 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrendingUp, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { TrendingUp, Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn, signUp, user, loading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate("/dashboard");
+    }
+  }, [user, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Demo credentials check
-    if (email === "demo@profuturos.com" && password === "demo123") {
+    if (!email || !password) {
       toast({
-        title: "Login realizado!",
-        description: "Bem-vindo de volta à ProFuturos Academy.",
-      });
-      navigate("/dashboard");
-    } else if (email && password) {
-      toast({
-        title: "Credenciais inválidas",
-        description: "Use: demo@profuturos.com / demo123",
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos para continuar.",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (isSignUp && !fullName) {
+      toast({
+        title: "Nome obrigatório",
+        description: "Digite seu nome completo para criar a conta.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(email, password, fullName);
+        if (error) {
+          if (error.message.includes("already registered")) {
+            toast({
+              title: "E-mail já cadastrado",
+              description: "Este e-mail já está em uso. Tente fazer login.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Erro no cadastro",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+        } else {
+          toast({
+            title: "Conta criada!",
+            description: "Bem-vindo à ProFuturos Academy.",
+          });
+          navigate("/dashboard");
+        }
+      } else {
+        const { error } = await signIn(email, password);
+        if (error) {
+          toast({
+            title: "Credenciais inválidas",
+            description: "E-mail ou senha incorretos. Tente novamente.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login realizado!",
+            description: "Bem-vindo de volta à ProFuturos Academy.",
+          });
+          navigate("/dashboard");
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -55,14 +131,37 @@ const Login = () => {
         <div className="bg-card border border-border rounded-2xl p-8 shadow-[0_4px_24px_hsl(0_0%_0%/0.3)]">
           <div className="text-center mb-8">
             <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-              Área do Aluno
+              {isSignUp ? "Criar Conta" : "Área do Aluno"}
             </h1>
             <p className="text-muted-foreground text-sm">
-              Faça login para acessar suas aulas e materiais exclusivos.
+              {isSignUp 
+                ? "Crie sua conta para acessar o conteúdo exclusivo."
+                : "Faça login para acessar suas aulas e materiais exclusivos."
+              }
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-foreground">
+                  Nome completo
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Seu nome completo"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10 bg-secondary border-border focus:border-primary"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
                 E-mail
@@ -76,6 +175,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-secondary border-border focus:border-primary"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -93,6 +193,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 bg-secondary border-border focus:border-primary"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -104,24 +205,43 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="text-right">
-              <a href="#" className="text-sm text-primary hover:underline">
-                Esqueci minha senha
-              </a>
-            </div>
+            {!isSignUp && (
+              <div className="text-right">
+                <a href="#" className="text-sm text-primary hover:underline">
+                  Esqueci minha senha
+                </a>
+              </div>
+            )}
 
-            <Button type="submit" variant="hero" className="w-full" size="lg">
-              Entrar
-              <ArrowRight className="w-4 h-4" />
+            <Button 
+              type="submit" 
+              variant="hero" 
+              className="w-full" 
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  {isSignUp ? "Criar conta" : "Entrar"}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </Button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
-            <p className="text-sm text-center text-muted-foreground">
-              <span className="font-semibold text-foreground">Credenciais de demonstração:</span>
-              <br />
-              demo@profuturos.com / demo123
+          {/* Toggle between login and signup */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              {isSignUp ? "Já tem uma conta?" : "Não tem uma conta?"}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="ml-1 text-primary hover:underline font-medium"
+              >
+                {isSignUp ? "Fazer login" : "Criar conta"}
+              </button>
             </p>
           </div>
         </div>
