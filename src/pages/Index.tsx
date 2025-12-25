@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, TrendingUp, Users, Award, Shield } from "lucide-react";
 import heroImage from "@/assets/hero-trading.jpg";
-import mentorAvatar from "@/assets/mentor-avatar.jpg.jpeg";
+import mentorAvatar from "@//assets/mentor-avatar.jpg.jpeg";
 import testimonial1 from "@/assets/testimonial-1.jpg";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -41,10 +41,10 @@ const Index = () => {
   ];
 
   const stats = [
-    { value: "1.200+", label: "Alunos" },
-    { value: "R$ 5M+", label: "Lucro Gerado" },
+    { value: "300+", label: "Alunos" },
+    { value: "R$ 100k+", label: "Lucro Gerado" },
     { value: "97%", label: "Satisfação" },
-    { value: "3 Anos", label: "No Mercado" },
+    { value: "1 Anos", label: "No Mercado" },
   ];
 
   return (
@@ -141,7 +141,7 @@ const Index = () => {
               <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
               <img
                 src={mentorAvatar}
-                alt="Rafael Costa - Mentor"
+                alt="Julia Jesus - Mentor"
                 className="relative w-full max-w-md mx-auto rounded-2xl shadow-card"
               />
             </div>
@@ -152,14 +152,14 @@ const Index = () => {
               </h2>
               <h3 className="text-xl font-semibold text-foreground mb-4">Rafael Costa</h3>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Trader profissional há mais de 8 anos, especialista em mercado de futuros de criptomoedas. 
-                Já ajudou mais de 2.500 alunos a desenvolverem suas habilidades no mercado financeiro.
+                Trader profissional há mais de 2 anos, especialista em mercado de futuros de criptomoedas. 
+                Já ajudou mais de 300 alunos a desenvolverem suas habilidades no mercado financeiro.
               </p>
               <ul className="space-y-3 mb-8">
                 {[
-                  "8+ anos de experiência no mercado",
+                  "2+ anos de experiência no mercado",
                   "Certificado pela CVM",
-                  "Mais de R$ 15 milhões em operações",
+                  "Mais de R$ 100 k em operações",
                   "Metodologia própria e comprovada",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-3 text-foreground">
