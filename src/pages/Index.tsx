@@ -150,7 +150,7 @@ const Index = () => {
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6">
                 Conheça Seu <span className="text-primary">Mentor</span>
               </h2>
-              <h3 className="text-xl font-semibold text-foreground mb-4">Rafael Costa</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-4">Julia Jesus</h3>
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 Trader profissional há mais de 2 anos, especialista em mercado de futuros de criptomoedas. 
                 Já ajudou mais de 300 alunos a desenvolverem suas habilidades no mercado financeiro.
