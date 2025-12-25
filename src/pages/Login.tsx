@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { TrendingUp, Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import Logo from "@/components/Logo";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -118,14 +119,11 @@ const Login = () => {
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
-        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-[0_4px_20px_hsl(153_100%_39%/0.3)]">
-            <TrendingUp className="w-7 h-7 text-primary-foreground" />
-          </div>
-          <span className="font-display font-bold text-2xl text-foreground">
-            Pro<span className="text-primary">Futuros</span>
-          </span>
-        </Link>
+       
+       <div className="flex justify-center mb-8">
+  <Logo size="lg" />
+</div>
+
 
         {/* Card */}
         <div className="bg-card border border-border rounded-2xl p-8 shadow-[0_4px_24px_hsl(0_0%_0%/0.3)]">

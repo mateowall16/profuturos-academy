@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { TrendingUp, Instagram, Youtube, MessageCircle } from "lucide-react";
+import Logo from "@/components/Logo";
 
 const Footer = () => {
   return (
@@ -8,14 +9,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description */}
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="font-display font-bold text-xl text-foreground">
-                Pro<span className="text-primary">Futuros</span>
-              </span>
-            </Link>
+            <div className="mb-4">
+  <Logo size="md" />
+</div>
+
             <p className="text-muted-foreground text-sm leading-relaxed">
               A mentoria definitiva para você dominar o mercado de futuros na Binance e conquistar sua liberdade financeira.
             </p>

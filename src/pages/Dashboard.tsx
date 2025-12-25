@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import Logo from "@/components/Logo";
 
 const Dashboard = () => {
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
@@ -107,14 +108,11 @@ const Dashboard = () => {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-display font-bold">
-              Pro<span className="text-primary">Futuros</span>
-            </span>
-          </Link>
+          
+          <Logo size="lg" />
+
+
+
 
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground hidden sm:block">
