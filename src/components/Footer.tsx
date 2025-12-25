@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { TrendingUp, Instagram, Youtube, MessageCircle } from "lucide-react";
+import {  Instagram, Youtube, MessageCircle } from "lucide-react";
 import Logo from "@/components/Logo";
 
 const Footer = () => {
