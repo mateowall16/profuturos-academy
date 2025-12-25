@@ -4,7 +4,6 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo";
 
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -13,7 +12,7 @@ const Header = () => {
     { href: "/", label: "Início" },
     { href: "/mentoria", label: "Mentoria" },
     { href: "/faq", label: "FAQ" },
-    { href: "/contato", label: "Contato" },
+    { href: "/faq#contato", label: "Contato" }, 
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -23,9 +22,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          
           <Logo size="lg" />
-
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
@@ -74,7 +71,9 @@ const Header = () => {
                   key={link.href}
                   to={link.href}
                   className={`text-base font-medium py-2 transition-colors hover:text-primary ${
-                    isActive(link.href) ? "text-primary" : "text-muted-foreground"
+                    isActive(link.href)
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

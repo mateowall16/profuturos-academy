@@ -32,7 +32,7 @@ const FAQ = () => {
     {
       question: "Vou perder dinheiro operando?",
       answer:
-        "Todo mercado envolve risco. Por isso, o foco da mentoria é ensinar gestão de risco, controle emocional e tomada de decisão consciente — nunca prometer ganhos fáceis.",
+        "Todo mercado envolve risco. O foco da mentoria é ensinar gestão de risco, controle emocional e tomada de decisão consciente — nunca prometer ganhos fáceis.",
     },
     {
       question: "A mentoria é sinal de trade?",
@@ -93,7 +93,7 @@ const FAQ = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ */}
       <section className="pb-16 md:pb-24">
         <div className="container mx-auto px-4 max-w-3xl">
           <Accordion type="single" collapsible className="space-y-4">
@@ -113,7 +113,7 @@ const FAQ = () => {
             ))}
           </Accordion>
 
-          {/* CTA após FAQ */}
+          {/* CTA */}
           <div className="text-center mt-16">
             <p className="text-lg text-muted-foreground mb-6">
               Se essas respostas fizeram sentido para você, o próximo passo é
@@ -127,8 +127,11 @@ const FAQ = () => {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section className="py-16 md:py-24 bg-card/50" id="contato">
+      {/* CONTATO */}
+      <section
+        id="contato"
+        className="py-16 md:py-24 bg-card/50 scroll-mt-24"
+      >
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -150,7 +153,6 @@ const FAQ = () => {
                     placeholder="Seu nome"
                     value={formData.name}
                     onChange={handleChange}
-                    className="bg-secondary border-border"
                   />
                 </div>
 
@@ -163,7 +165,6 @@ const FAQ = () => {
                     placeholder="seu@email.com"
                     value={formData.email}
                     onChange={handleChange}
-                    className="bg-secondary border-border"
                   />
                 </div>
 
@@ -176,7 +177,6 @@ const FAQ = () => {
                     rows={5}
                     value={formData.message}
                     onChange={handleChange}
-                    className="bg-secondary border-border resize-none"
                   />
                 </div>
 
