@@ -123,11 +123,16 @@ const Checkout = () => {
           {/* Checkout Form */}
           <div className="order-1 lg:order-2">
             <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2">
-              Finalizar Compra
+              Finalize sua inscrição na Mentoria Binance Pro
             </h1>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-4">
               Preencha seus dados para garantir sua vaga na mentoria.
             </p>
+            <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 mb-8">
+              <p className="text-sm text-yellow-500">
+                ⚠️ Simulação de checkout — este projeto é demonstrativo.
+              </p>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Personal Data */}
@@ -275,7 +280,7 @@ const Checkout = () => {
 
               <Button type="submit" variant="hero" size="xl" className="w-full">
                 <Lock className="w-4 h-4" />
-                Finalizar Compra
+                Concluir inscrição
                 <ArrowRight className="w-4 h-4" />
               </Button>
 
