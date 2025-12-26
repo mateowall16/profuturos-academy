@@ -12,7 +12,7 @@ const IntroVideo = ({ onWatched, isWatched }: IntroVideoProps) => {
   const handlePlay = () => {
     setIsPlaying(true);
   };
-
+ 
   return (
     <div className="bg-card border border-border rounded-2xl overflow-hidden mb-8">
       <div className="p-4 md:p-6 border-b border-border flex items-center justify-between">
