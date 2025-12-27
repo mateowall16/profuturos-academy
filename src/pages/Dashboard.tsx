@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import confetti from "canvas-confetti";
 import {
   TrendingUp,
   ShieldCheck,
@@ -13,6 +14,7 @@ import {
   Users,
   MessageCircle,
   LucideIcon,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +23,8 @@ import Logo from "@/components/Logo";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import IntroVideo from "@/components/dashboard/IntroVideo";
 import ProgressChecklist from "@/components/dashboard/ProgressChecklist";
+import WhatsAppButton from "@/components/dashboard/WhatsAppButton";
+import MotivationalMessage from "@/components/dashboard/MotivationalMessage";
 
 /* ================= TYPES ================= */
 type Module = {
@@ -126,6 +130,15 @@ const Dashboard = () => {
   );
 
   /* ================= ACTIONS ================= */
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#9370DB']
+    });
+  };
+
   const markAsCompleted = (id: number) => {
     if (completedModules.includes(id)) return;
 
@@ -133,10 +146,20 @@ const Dashboard = () => {
     setCompletedModules(updated);
     localStorage.setItem("completedModules", JSON.stringify(updated));
 
-    toast({
-      title: "Aula concluída 🎉",
-      description: "Seu progresso foi atualizado.",
-    });
+    // Check if all modules completed
+    const unlockedModules = modules.filter(m => !m.locked);
+    if (updated.length === unlockedModules.length) {
+      triggerConfetti();
+      toast({
+        title: "Parabéns! Você completou tudo! 🏆",
+        description: "Você é um verdadeiro dedicado!",
+      });
+    } else {
+      toast({
+        title: "Aula concluída 🎉",
+        description: "Seu progresso foi atualizado.",
+      });
+    }
 
     setSelectedModule(null);
   };
@@ -243,6 +266,9 @@ const Dashboard = () => {
         {/* Progress Checklist */}
         <ProgressChecklist items={checklistItems} />
 
+        {/* Motivational Message */}
+        <MotivationalMessage progressPercent={moduleProgress} />
+
         {/* Modules Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -267,6 +293,10 @@ const Dashboard = () => {
             {modules.map((module) => {
               const completed = completedModules.includes(module.id);
               const ModuleIcon = module.icon;
+              
+              // Find next recommended module (first unlocked, not completed)
+              const nextModuleId = modules.find(m => !m.locked && !completedModules.includes(m.id))?.id;
+              const isNextModule = module.id === nextModuleId && !completed;
 
               return (
                 <div
@@ -279,9 +309,21 @@ const Dashboard = () => {
                       ? "border-primary/50 bg-primary/5"
                       : module.locked 
                         ? "border-border opacity-60 cursor-not-allowed"
-                        : "border-border hover:border-primary/50"
+                        : isNextModule
+                          ? "border-primary ring-2 ring-primary/30"
+                          : "border-border hover:border-primary/50"
                     }`}
                 >
+                  {/* Next Module Badge */}
+                  {isNextModule && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-xs font-semibold px-2 py-1 rounded-full animate-pulse">
+                        <Star className="w-3 h-3" />
+                        Próximo
+                      </span>
+                    </div>
+                  )}
+
                   {completed && (
                     <div className="absolute top-3 right-3 z-10">
                       <CheckCircle className="w-6 h-6 text-primary" />
@@ -321,6 +363,9 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* WhatsApp Fixed Button */}
+      <WhatsAppButton />
 
       {/* ================= VIDEO MODAL ================= */}
       {selectedModule && activeModule && (
