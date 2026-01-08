@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  TrendingUp,
-  ShieldCheck,
-  Brain,
   Video,
   LogOut,
-  GraduationCap,
-  Lock,
   CheckCircle,
   BookOpen,
   Users,
   MessageCircle,
-  LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -21,16 +15,17 @@ import Logo from "@/components/Logo";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import IntroVideo from "@/components/dashboard/IntroVideo";
 import ProgressChecklist from "@/components/dashboard/ProgressChecklist";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ================= TYPES ================= */
 type Module = {
   id: number;
   title: string;
-  description: string;
-  icon: LucideIcon;
-  thumbnail: string;
-  videoUrl: string | null;
-  locked: boolean;
+  description: string | null;
+  thumbnail: string | null;
+  video_url: string | null;
+  order_index: number;
+  is_free: boolean;
 };
 
 const Dashboard = () => {
@@ -39,75 +34,23 @@ const Dashboard = () => {
   const [introVideoWatched, setIntroVideoWatched] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(true);
 
+  // PASSO 1
+  const [isPaid, setIsPaid] = useState<boolean>(false);
+
+  // PASSO 2
+  const [modules, setModules] = useState<Module[]>([]);
+
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Aluno";
+  const userName =
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Aluno";
 
-  /* ================= MÓDULOS ================= */
-  const modules: Module[] = [
-    {
-      id: 1,
-      title: "Apresentação da Mentoria",
-      description: "Boas-vindas e visão geral da metodologia.",
-      icon: GraduationCap,
-      thumbnail:
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800",
-      videoUrl:
-        "https://drive.google.com/file/d/1ANxz2tgNhdM3hNxW9l_0EdEPeDhHPp5I/preview",
-      locked: false,
-    },
-    {
-      id: 2,
-      title: "TradingView + Futuros na Teoria",
-      description: "Entendendo o TradingView e o mercado futuro.",
-      icon: TrendingUp,
-      thumbnail:
-        "https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=800",
-      videoUrl:
-        "https://drive.google.com/file/d/1DDr03aWbqb0176RWp4De1CRb_JEV0NMJ/preview",
-      locked: false,
-    },
-    {
-      id: 3,
-      title: "Gestão de Risco",
-      description: "Proteção de capital e controle emocional.",
-      icon: ShieldCheck,
-      thumbnail:
-        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800",
-      videoUrl: null,
-      locked: true,
-    },
-    {
-      id: 4,
-      title: "Psicologia do Trader",
-      description: "Mentalidade para consistência no mercado.",
-      icon: Brain,
-      thumbnail:
-        "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=800",
-      videoUrl: null,
-      locked: true,
-    },
-    {
-      id: 5,
-      title: "Operações ao Vivo",
-      description: "Acompanhamento prático de operações reais.",
-      icon: Video,
-      thumbnail:
-        "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800",
-      videoUrl: null,
-      locked: true,
-    },
-  ];
-
-  /* ================= LOAD STATE ================= */
+  /* ================= LOCAL STATE (apenas UI) ================= */
   useEffect(() => {
-    const savedCompleted = localStorage.getItem("completedModules");
-    if (savedCompleted) {
-      setCompletedModules(JSON.parse(savedCompleted));
-    }
-
     const savedIntroWatched = localStorage.getItem("introVideoWatched");
     if (savedIntroWatched === "true") {
       setIntroVideoWatched(true);
@@ -117,29 +60,123 @@ const Dashboard = () => {
     if (visitCount && parseInt(visitCount) > 1) {
       setIsFirstVisit(false);
     }
-    localStorage.setItem("dashboardVisits", String((parseInt(visitCount || "0") + 1)));
+
+    localStorage.setItem(
+      "dashboardVisits",
+      String(parseInt(visitCount || "0") + 1)
+    );
   }, []);
 
-  /* ================= CALC PROGRESS ================= */
-  const moduleProgress = Math.round(
-    (completedModules.length / modules.length) * 100
-  );
+  /* ================= FETCH PROFILE ================= */
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("is_paid")
+      .eq("id", user.id)
+      .single<{ is_paid: boolean }>();
+
+    if (error) {
+      console.error("Erro ao buscar profile:", error);
+      return;
+    }
+
+    setIsPaid(data.is_paid);
+  };
+
+  /* ================= FETCH MODULES ================= */
+  
+  
+  
+const fetchModules = async () => {
+  const { data, error } = await supabase
+    .from("modules")
+    .select("*")
+    .order("order_index", { ascending: true });
+
+  console.log("modules data:", data);
+  console.log("modules error:", error);
+
+  if (error) {
+    console.error("Erro ao buscar módulos:", error);
+    return;
+  }
+
+  setModules(data);
+};
+
+
+  /* ================= PASSO 3 — FETCH USER PROGRESS ================= */
+  const fetchUserProgress = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("user_progress")
+      .select("module_id")
+      .eq("user_id", user.id)
+      .eq("completed", true);
+
+    if (error) {
+      console.error("Erro ao buscar progresso:", error);
+      return;
+    }
+
+    const completedIds = data.map((item) => item.module_id);
+    setCompletedModules(completedIds);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+
+    fetchProfile();
+    fetchModules();
+    fetchUserProgress();
+  }, [user]);
+
+  /* ================= PROGRESS ================= */
+  const moduleProgress = modules.length
+    ? Math.round((completedModules.length / modules.length) * 100)
+    : 0;
 
   /* ================= ACTIONS ================= */
-  const markAsCompleted = (id: number) => {
-    if (completedModules.includes(id)) return;
+  const markAsCompleted = async (moduleId: number) => {
+  if (!user) return;
+  if (completedModules.includes(moduleId)) return;
 
-    const updated = [...completedModules, id];
-    setCompletedModules(updated);
-    localStorage.setItem("completedModules", JSON.stringify(updated));
+  const { error } = await supabase
+    .from("user_progress")
+    .upsert(
+      {
+        user_id: user.id,
+        module_id: moduleId,
+        completed: true,
+      },
+      {
+        onConflict: "user_id,module_id",
+      }
+    );
 
+  if (error) {
+    console.error("Erro ao salvar progresso:", error);
     toast({
-      title: "Aula concluída 🎉",
-      description: "Seu progresso foi atualizado.",
+      title: "Erro",
+      description: "Não foi possível salvar seu progresso.",
+      variant: "destructive",
     });
+    return;
+  }
 
-    setSelectedModule(null);
-  };
+  setCompletedModules((prev) => [...prev, moduleId]);
+
+  toast({
+    title: "Aula concluída 🎉",
+    description: "Seu progresso foi salvo com sucesso.",
+  });
+
+  setSelectedModule(null);
+};
+
 
   const handleIntroVideoWatched = () => {
     setIntroVideoWatched(true);
@@ -151,7 +188,7 @@ const Dashboard = () => {
   };
 
   const handleStartFirstLesson = () => {
-    setSelectedModule(1);
+    if (modules[0]) setSelectedModule(modules[0].id);
   };
 
   const handleSignOut = async () => {
@@ -161,7 +198,7 @@ const Dashboard = () => {
 
   const activeModule = modules.find((m) => m.id === selectedModule);
 
-  /* ================= CHECKLIST ITEMS ================= */
+  /* ================= CHECKLIST ================= */
   const checklistItems = [
     {
       id: "intro-video",
@@ -173,9 +210,9 @@ const Dashboard = () => {
     {
       id: "first-lesson",
       title: "Complete sua primeira aula",
-      description: "Comece pelo módulo 'Apresentação da Mentoria'.",
-      completed: completedModules.includes(1),
-      action: () => setSelectedModule(1),
+      description: "Comece pelo primeiro módulo.",
+      completed: completedModules.length > 0,
+      action: handleStartFirstLesson,
       actionLabel: "Assistir",
       icon: <BookOpen className="w-4 h-4" />,
     },
@@ -184,7 +221,8 @@ const Dashboard = () => {
       title: "Entre no grupo de alunos",
       description: "Conecte-se com outros traders da mentoria.",
       completed: false,
-      action: () => window.open("https://wa.me/5511999999999", "_blank"),
+      action: () =>
+        window.open("https://wa.me/5511999999999", "_blank"),
       actionLabel: "Entrar",
       icon: <Users className="w-4 h-4" />,
     },
@@ -194,17 +232,20 @@ const Dashboard = () => {
       description: "Tire suas dúvidas com nosso assistente 24h.",
       completed: false,
       action: () => {
-        const probotButton = document.querySelector('[data-probot-toggle]') as HTMLButtonElement;
-        if (probotButton) probotButton.click();
+        const btn = document.querySelector(
+          "[data-probot-toggle]"
+        ) as HTMLButtonElement;
+        btn?.click();
       },
       actionLabel: "Abrir",
       icon: <MessageCircle className="w-4 h-4" />,
     },
   ];
 
+  /* ================= UI ================= */
   return (
     <div className="min-h-screen bg-background">
-      {/* ================= HEADER ================= */}
+      {/* HEADER */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Logo size="lg" />
@@ -224,61 +265,50 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* ================= MAIN ================= */}
       <main className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Welcome Banner - First Visit */}
         {isFirstVisit && (
-          <WelcomeBanner 
-            userName={userName} 
-            onStartFirstLesson={handleStartFirstLesson} 
+          <WelcomeBanner
+            userName={userName}
+            onStartFirstLesson={handleStartFirstLesson}
           />
         )}
 
-        {/* Intro Video */}
-        <IntroVideo 
-          onWatched={handleIntroVideoWatched} 
-          isWatched={introVideoWatched} 
+        <IntroVideo
+          onWatched={handleIntroVideoWatched}
+          isWatched={introVideoWatched}
         />
 
-        {/* Progress Checklist */}
         <ProgressChecklist items={checklistItems} />
 
-        {/* Modules Section */}
+        {/* ================= MODULES SECTION ================= */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="font-semibold text-lg">Seus Módulos</h2>
-              <p className="text-sm text-muted-foreground">
-                {completedModules.length} de {modules.length} concluídos ({moduleProgress}%)
-              </p>
-            </div>
+          <div className="mb-6">
+            <h2 className="font-semibold text-lg">Seus Módulos</h2>
+            <p className="text-sm text-muted-foreground">
+              {completedModules.length} de {modules.length} concluídos (
+              {moduleProgress}%)
+            </p>
           </div>
 
-          {/* Progress bar */}
           <div className="h-2 bg-secondary rounded-full mb-6 overflow-hidden">
-            <div 
-              className="h-full bg-primary rounded-full transition-all duration-500"
+            <div
+              className="h-full bg-primary transition-all"
               style={{ width: `${moduleProgress}%` }}
             />
           </div>
 
-          {/* Module cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {modules.map((module) => {
               const completed = completedModules.includes(module.id);
-              const ModuleIcon = module.icon;
 
               return (
                 <div
                   key={module.id}
-                  onClick={() => {
-                    if (!module.locked) setSelectedModule(module.id);
-                  }}
+                  onClick={() => setSelectedModule(module.id)}
                   className={`relative bg-card border rounded-xl overflow-hidden cursor-pointer transition-all hover:scale-[1.02]
-                    ${completed
-                      ? "border-primary/50 bg-primary/5"
-                      : module.locked 
-                        ? "border-border opacity-60 cursor-not-allowed"
+                    ${
+                      completed
+                        ? "border-primary/50 bg-primary/5"
                         : "border-border hover:border-primary/50"
                     }`}
                 >
@@ -288,28 +318,23 @@ const Dashboard = () => {
                     </div>
                   )}
 
-                  {module.locked && (
-                    <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 flex items-center justify-center">
-                      <div className="text-center">
-                        <Lock className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
-                        <span className="text-xs text-muted-foreground">Em breve</span>
-                      </div>
-                    </div>
-                  )}
-
                   <div className="aspect-video relative">
-                    <img
-                      src={module.thumbnail}
-                      alt={module.title}
-                      className="w-full h-full object-cover"
-                    />
+                    {module.thumbnail && (
+                      <img
+                        src={module.thumbnail}
+                        alt={module.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                   </div>
 
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <ModuleIcon className="w-4 h-4 text-primary" />
-                      <h3 className="font-semibold text-sm">{module.title}</h3>
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      <h3 className="font-semibold text-sm">
+                        {module.title}
+                      </h3>
                     </div>
                     <p className="text-xs text-muted-foreground line-clamp-2">
                       {module.description}
@@ -325,11 +350,11 @@ const Dashboard = () => {
       {/* ================= VIDEO MODAL ================= */}
       {selectedModule && activeModule && (
         <div className="fixed inset-0 bg-background/90 backdrop-blur z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-5xl overflow-hidden animate-scale-in">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-5xl overflow-hidden">
             <div className="aspect-video bg-secondary">
-              {activeModule.videoUrl ? (
+              {activeModule.video_url ? (
                 <iframe
-                  src={activeModule.videoUrl}
+                  src={activeModule.video_url}
                   className="w-full h-full"
                   allow="autoplay; fullscreen"
                   allowFullScreen
@@ -345,9 +370,11 @@ const Dashboard = () => {
             <div className="p-6 flex flex-col sm:flex-row gap-4 justify-between items-center border-t border-border">
               <div>
                 <h3 className="font-semibold">{activeModule.title}</h3>
-                <p className="text-sm text-muted-foreground">{activeModule.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {activeModule.description}
+                </p>
               </div>
-              
+
               <div className="flex gap-3">
                 <Button
                   variant="outline"
