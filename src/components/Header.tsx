@@ -12,10 +12,35 @@ const Header = () => {
     { href: "/", label: "Início" },
     { href: "/mentoria", label: "Mentoria" },
     { href: "/faq", label: "FAQ" },
-    { href: "/faq#contato", label: "Contato" }, 
+    { href: "/faq#contato", label: "Contato" },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  /**
+   * Lógica correta de ativo:
+   * - /faq        → FAQ ativo (somente se NÃO houver hash)
+   * - /faq#contato → Contato ativo
+   * - demais rotas → match direto
+   */
+  const isActive = (href: string) => {
+    // CONTATO
+    if (href === "/faq#contato") {
+      return (
+        location.pathname === "/faq" &&
+        location.hash === "#contato"
+      );
+    }
+
+    // FAQ (somente sem hash)
+    if (href === "/faq") {
+      return (
+        location.pathname === "/faq" &&
+        location.hash === ""
+      );
+    }
+
+    // Rotas normais
+    return location.pathname === href;
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -31,7 +56,9 @@ const Header = () => {
                 key={link.href}
                 to={link.href}
                 className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(link.href) ? "text-primary" : "text-muted-foreground"
+                  isActive(link.href)
+                    ? "text-primary"
+                    : "text-muted-foreground"
                 }`}
               >
                 {link.label}
@@ -57,8 +84,13 @@ const Header = () => {
           <button
             className="md:hidden p-2 text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Abrir menu"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
@@ -80,6 +112,7 @@ const Header = () => {
                   {link.label}
                 </Link>
               ))}
+
               <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="outline" className="w-full">
