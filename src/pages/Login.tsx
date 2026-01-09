@@ -3,9 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrendingUp, Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  User,
+  ShieldCheck,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Logo from "@/components/Logo";
 
 const Login = () => {
@@ -15,34 +24,30 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signIn, signUp, user, loading } = useAuth();
 
-  // Redirect if already logged in
+  /* =======================
+     REDIRECT IF LOGGED
+  ======================= */
   useEffect(() => {
     if (user && !loading) {
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     }
   }, [user, loading, navigate]);
 
+  /* =======================
+     SUBMIT
+  ======================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
+
+    if (!email || !password || (isSignUp && !fullName)) {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha todos os campos para continuar.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (isSignUp && !fullName) {
-      toast({
-        title: "Nome obrigatório",
-        description: "Digite seu nome completo para criar a conta.",
         variant: "destructive",
       });
       return;
@@ -54,23 +59,15 @@ const Login = () => {
       if (isSignUp) {
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          if (error.message.includes("already registered")) {
-            toast({
-              title: "E-mail já cadastrado",
-              description: "Este e-mail já está em uso. Tente fazer login.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Erro no cadastro",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Erro ao criar conta",
+            description: error.message,
+            variant: "destructive",
+          });
         } else {
           toast({
-            title: "Conta criada!",
-            description: "Bem-vindo à JFN Trading Academy.",
+            title: "Conta criada com sucesso!",
+            description: "Bem-vindo(a) à área do aluno.",
           });
           navigate("/dashboard");
         }
@@ -79,31 +76,54 @@ const Login = () => {
         if (error) {
           toast({
             title: "Credenciais inválidas",
-            description: "E-mail ou senha incorretos. Tente novamente.",
+            description: "E-mail ou senha incorretos.",
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Login realizado!",
-            description: "Bem-vindo de volta à JFN Trading Academy.",
+            title: "Login realizado",
+            description: "Bom te ver novamente.",
           });
           navigate("/dashboard");
         }
       }
-    } catch (error) {
-      toast({
-        title: "Erro inesperado",
-        description: "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
+  /* =======================
+     RESET PASSWORD
+  ======================= */
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Informe seu e-mail",
+        description: "Digite seu e-mail para recuperar a senha.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      toast({
+        title: "Erro ao enviar e-mail",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "E-mail enviado",
+        description: "Verifique sua caixa de entrada.",
+      });
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -111,143 +131,111 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      </div>
-
       <div className="relative w-full max-w-md">
-        {/* Logo */}
-       
-       <div className="flex justify-center mb-8">
-  <Logo size="lg" />
-</div>
+        {/* LOGO */}
+        <div className="flex justify-center mb-8">
+          <Logo size="lg" />
+        </div>
 
-
-        {/* Card */}
-        <div className="bg-card border border-border rounded-2xl p-8 shadow-[0_4px_24px_hsl(0_0%_0%/0.3)]">
-          <div className="text-center mb-8">
-            <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-              {isSignUp ? "Criar Conta" : "Área do Aluno"}
+        {/* CARD */}
+        <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
+          <div className="text-center mb-6">
+            <h1 className="font-display text-2xl font-bold mb-2">
+              {isSignUp ? "Criar conta" : "Área do aluno"}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isSignUp 
-                ? "Crie sua conta para acessar o conteúdo exclusivo."
-                : "Faça login para acessar suas aulas e materiais exclusivos."
-              }
+              {isSignUp
+                ? "Crie sua conta para acessar a mentoria."
+                : "Entre para continuar seus estudos."}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-foreground">
-                  Nome completo
-                </Label>
+                <Label>Nome completo</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Seu nome completo"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 bg-secondary border-border focus:border-primary"
-                    disabled={isLoading}
+                    className="pl-10"
+                    placeholder="Seu nome"
                   />
                 </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                E-mail
-              </Label>
+              <Label>E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  id="email"
                   type="email"
-                  placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-secondary border-border focus:border-primary"
-                  disabled={isLoading}
+                  className="pl-10"
+                  placeholder="seu@email.com"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
-                Senha
-              </Label>
+              <Label>Senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 bg-secondary border-border focus:border-primary"
-                  disabled={isLoading}
+                  className="pl-10 pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff /> : <Eye />}
                 </button>
               </div>
             </div>
 
             {!isSignUp && (
-              <div className="text-right">
-                <a href="#" className="text-sm text-primary hover:underline">
-                  Esqueci minha senha
-                </a>
-              </div>
+              <button
+                type="button"
+                onClick={handleResetPassword}
+                className="text-sm text-primary hover:underline text-right w-full"
+              >
+                Esqueci minha senha
+              </button>
             )}
 
-            <Button 
-              type="submit" 
-              variant="hero" 
-              className="w-full" 
-              size="lg"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  {isSignUp ? "Criar conta" : "Entrar"}
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+            <Button type="submit" variant="hero" size="lg" className="w-full">
+              {isSignUp ? "Criar conta" : "Entrar"}
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </form>
 
-          {/* Toggle between login and signup */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              {isSignUp ? "Já tem uma conta?" : "Não tem uma conta?"}
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="ml-1 text-primary hover:underline font-medium"
-              >
-                {isSignUp ? "Fazer login" : "Criar conta"}
-              </button>
-            </p>
+          {/* MICRO-CONFIANÇA */}
+          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-muted-foreground">
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            Seus dados estão protegidos
+          </div>
+
+          {/* TOGGLE */}
+          <div className="mt-6 text-center text-sm">
+            {isSignUp ? "Já tem conta?" : "Ainda não tem conta?"}
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="ml-1 text-primary hover:underline font-medium"
+            >
+              {isSignUp ? "Fazer login" : "Criar conta"}
+            </button>
           </div>
         </div>
 
-        <p className="text-center text-muted-foreground text-sm mt-6">
-          <Link to="/" className="hover:text-primary transition-colors">
-            ← Voltar para o início
-          </Link>
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          <Link to="/">← Voltar para o início</Link>
         </p>
       </div>
     </div>

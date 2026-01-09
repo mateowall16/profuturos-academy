@@ -6,6 +6,10 @@ import clsx from "clsx";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+/* =======================
+   TYPES
+======================= */
+
 type Lesson = {
   id: number;
   title: string;
@@ -18,6 +22,17 @@ type LessonProgress = {
   completed: boolean;
 };
 
+type LessonDocument = {
+  id: number;
+  title: string;
+  file_url: string;
+  type: "pdf" | "sheet" | "link";
+};
+
+/* =======================
+   COMPONENT
+======================= */
+
 const LessonPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -25,6 +40,7 @@ const LessonPage = () => {
 
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [progress, setProgress] = useState<LessonProgress[]>([]);
+  const [documents, setDocuments] = useState<LessonDocument[]>([]);
   const [loading, setLoading] = useState(true);
 
   const currentId = Number(id);
@@ -32,6 +48,7 @@ const LessonPage = () => {
   /* =======================
      LOAD DATA
   ======================= */
+
   useEffect(() => {
     if (!user) return;
 
@@ -48,13 +65,19 @@ const LessonPage = () => {
         .select("lesson_id, completed")
         .eq("user_id", user.id);
 
+      const { data: documentsData } = await supabase
+        .from("lesson_documents")
+        .select("id, title, file_url, type")
+        .eq("lesson_id", currentId);
+
       setLessons(lessonsData || []);
       setProgress(progressData || []);
+      setDocuments(documentsData || []);
       setLoading(false);
     };
 
     loadData();
-  }, [user]);
+  }, [user, currentId]);
 
   if (loading) {
     return (
@@ -66,9 +89,11 @@ const LessonPage = () => {
 
   const lesson = lessons.find((l) => l.id === currentId);
   const completedLessons = progress.filter((p) => p.completed).map((p) => p.lesson_id);
-
   const isCompleted = completedLessons.includes(currentId);
-  const nextLesson = lessons.find((l) => l.order_index === lesson?.order_index + 1);
+
+  const nextLesson = lessons.find(
+    (l) => l.order_index === lesson?.order_index + 1
+  );
 
   const progressPercent = Math.round(
     (completedLessons.length / lessons.length) * 100
@@ -136,14 +161,9 @@ const LessonPage = () => {
             />
           </div>
 
-          <div>
-            <h1 className="font-display text-2xl font-bold mb-1">
-              {lesson.title}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Aula focada em aprendizado prático e direto ao ponto.
-            </p>
-          </div>
+          <h1 className="font-display text-2xl font-bold">
+            {lesson.title}
+          </h1>
 
           {/* AÇÕES */}
           <div className="flex flex-col sm:flex-row gap-4 items-center">
@@ -156,6 +176,30 @@ const LessonPage = () => {
                 <CheckCircle className="w-5 h-5" />
                 Concluída
               </div>
+            )}
+          </div>
+
+          {/* 📎 MATERIAIS DA AULA */}
+          <div className="border border-border rounded-xl p-4 space-y-3 bg-card">
+            <h3 className="font-semibold text-sm">Materiais da aula</h3>
+
+            {documents.length > 0 ? (
+              documents.map((doc) => (
+                <a
+                  key={doc.id}
+                  href={doc.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary transition"
+                >
+                  <FileText className="w-5 h-5 text-primary" />
+                  <span className="text-sm">{doc.title}</span>
+                </a>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Nenhum material disponível para esta aula.
+              </p>
             )}
           </div>
         </section>

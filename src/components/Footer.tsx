@@ -14,8 +14,8 @@ const Footer = () => {
             </div>
 
             <p className="text-muted-foreground text-sm leading-relaxed">
-              A mentoria definitiva para você dominar o mercado de futuros na
-              Binance e conquistar sua liberdade financeira.
+              Mentoria educacional focada em mercado futuro de criptomoedas,
+              com método, gestão de risco e responsabilidade.
             </p>
           </div>
 
@@ -76,18 +76,18 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  to="/termos"
                   className="text-muted-foreground hover:text-primary transition-colors text-sm"
                 >
-                  Perguntas Frequentes
+                  Termos de Uso
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/faq#contato"
+                  to="/privacidade"
                   className="text-muted-foreground hover:text-primary transition-colors text-sm"
                 >
-                  Fale Conosco
+                  Política de Privacidade
                 </Link>
               </li>
             </ul>
@@ -136,21 +136,22 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-muted-foreground text-sm">
-              © 2025 JFN Trading. Todos os direitos reservados.
+              © {new Date().getFullYear()} JFN Trading. Todos os direitos reservados.
             </p>
+
             <div className="flex gap-6">
-              <a
-                href="#"
+              <Link
+                to="/termos"
                 className="text-muted-foreground hover:text-primary transition-colors text-sm"
               >
                 Termos de Uso
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/privacidade"
                 className="text-muted-foreground hover:text-primary transition-colors text-sm"
               >
                 Política de Privacidade
-              </a>
+              </Link>
             </div>
           </div>
         </div>

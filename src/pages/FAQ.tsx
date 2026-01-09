@@ -13,6 +13,8 @@ import { Mail, Send } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const FAQ = () => {
   const [formData, setFormData] = useState({
@@ -22,42 +24,49 @@ const FAQ = () => {
   });
 
   const { toast } = useToast();
+  const { user } = useAuth();
+  const ctaLink = user ? "/checkout" : "/login";
 
   const faqs = [
     {
       question: "Preciso ter experiência com criptomoedas?",
       answer:
-        "Não. A mentoria foi criada justamente para quem está começando do zero. Você aprende desde os conceitos básicos até a execução prática, sempre com foco em clareza e gestão de risco.",
+        "Não. A mentoria foi criada para iniciantes e intermediários. Você aprende desde os fundamentos até a execução prática, sempre com foco em clareza, método e gestão de risco.",
     },
     {
-      question: "Vou perder dinheiro operando?",
+      question: "Isso é sinal de trade ou robô?",
       answer:
-        "Todo mercado envolve risco. O foco da mentoria é ensinar gestão de risco, controle emocional e tomada de decisão consciente — nunca prometer ganhos fáceis.",
+        "Não. A mentoria ensina você a analisar o mercado e tomar decisões próprias. O objetivo é autonomia e consistência, não dependência de sinais.",
     },
     {
-      question: "A mentoria é sinal de trade?",
+      question: "Vou ganhar dinheiro com a mentoria?",
       answer:
-        "Não. Você aprende a analisar o mercado e tomar suas próprias decisões. O objetivo é autonomia, não dependência de sinais.",
+        "Nenhum mercado oferece garantias. O foco aqui é ensinar método, gestão de risco e disciplina para que você opere de forma mais consciente e responsável.",
     },
     {
       question: "Quanto tempo por dia preciso dedicar?",
       answer:
-        "Em média, de 30 minutos a 1 hora por dia. A mentoria foi pensada para quem trabalha ou estuda e não pode ficar o dia inteiro na frente do gráfico.",
+        "Em média, entre 30 minutos e 1 hora por dia. A mentoria foi pensada para quem trabalha ou estuda e precisa de um aprendizado organizado e eficiente.",
     },
     {
       question: "As aulas ficam gravadas?",
       answer:
-        "Sim. Todas as aulas ficam gravadas e disponíveis na plataforma para você assistir no seu ritmo, quantas vezes quiser.",
+        "Sim. Todo o conteúdo fica gravado e disponível na plataforma para você assistir no seu ritmo, quantas vezes quiser.",
+    },
+    {
+      question: "Por quanto tempo terei acesso?",
+      answer:
+        "Após entrar, você tem acesso contínuo à plataforma e às aulas disponíveis, incluindo atualizações de conteúdo.",
     },
     {
       question: "Existe acompanhamento ou suporte?",
       answer:
-        "Sim. Você terá acesso a um grupo fechado de alunos e acompanhamento contínuo para tirar dúvidas e evoluir com mais segurança.",
+        "Sim. Você terá acesso a um grupo fechado de alunos e acompanhamento para tirar dúvidas e evoluir com mais segurança.",
     },
     {
-      question: "Existe algum tipo de garantia?",
+      question: "E se eu perceber que não é para mim?",
       answer:
-        "Você tem um prazo inicial para conhecer a metodologia e decidir com tranquilidade se a mentoria faz sentido para você.",
+        "Você terá um período inicial para conhecer a metodologia e decidir com tranquilidade se a mentoria faz sentido para você.",
     },
   ];
 
@@ -80,15 +89,15 @@ const FAQ = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero */}
+      {/* HERO */}
       <section className="pt-24 pb-16 md:pt-32 md:pb-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
             Perguntas <span className="text-primary">Frequentes</span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Tire suas dúvidas sobre a mentoria e entenda se ela faz sentido para
-            você começar com mais segurança.
+            Tire suas dúvidas e entenda se a mentoria faz sentido para o seu
+            momento.
           </p>
         </div>
       </section>
@@ -103,7 +112,7 @@ const FAQ = () => {
                 value={`item-${index}`}
                 className="bg-card border border-border rounded-xl px-6 data-[state=open]:border-primary/50"
               >
-                <AccordionTrigger className="text-left text-foreground font-medium py-4 hover:text-primary">
+                <AccordionTrigger className="text-left font-medium py-4 hover:text-primary">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-4">
@@ -117,28 +126,27 @@ const FAQ = () => {
           <div className="text-center mt-16">
             <p className="text-lg text-muted-foreground mb-6">
               Se essas respostas fizeram sentido para você, o próximo passo é
-              aprender com acompanhamento.
+              aprender com método e acompanhamento.
             </p>
 
-            <Button variant="hero" size="lg" asChild>
-              <a href="/mentoria">Quero entrar para a mentoria</a>
-            </Button>
+            <Link to={ctaLink}>
+              <Button variant="hero" size="lg">
+                Quero entrar na mentoria
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* CONTATO */}
-      <section
-        id="contato"
-        className="py-16 md:py-24 bg-card/50 scroll-mt-24"
-      >
+      <section id="contato" className="py-16 md:py-24 bg-card/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Fale <span className="text-primary">Conosco</span>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+              Ainda ficou alguma <span className="text-primary">dúvida</span>?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Ainda ficou alguma dúvida? Entre em contato.
+              Fale com a gente antes de tomar sua decisão.
             </p>
           </div>
 
@@ -173,14 +181,14 @@ const FAQ = () => {
                   <Textarea
                     id="message"
                     name="message"
-                    placeholder="Escreva sua mensagem..."
+                    placeholder="Escreva sua dúvida..."
                     rows={5}
                     value={formData.message}
                     onChange={handleChange}
                   />
                 </div>
 
-                <Button type="submit" variant="hero" className="w-full">
+                <Button type="submit" variant="hero" className="w-full gap-2">
                   Enviar mensagem
                   <Send className="w-4 h-4" />
                 </Button>
