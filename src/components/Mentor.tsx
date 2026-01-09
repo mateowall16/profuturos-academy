@@ -61,7 +61,7 @@ const Mentor = () => {
             </ul>
 
             {/* CTA */}
-            <Link to={ctaLink}>
+            <Link to="/mentoria">
               <Button variant="hero" size="lg" className="gap-2">
                 Quero entrar na mentoria
                 <ArrowRight className="w-5 h-5" />

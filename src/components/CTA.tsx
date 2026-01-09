@@ -29,7 +29,7 @@ const CTA = () => {
 
         {/* CTA */}
         <div className="flex justify-center mb-6">
-          <Link to={ctaLink}>
+          <Link to="/mentoria">
             <Button variant="hero" size="xl" className="gap-2">
               Quero entrar na mentoria
               <ArrowRight className="w-5 h-5" />

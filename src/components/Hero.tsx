@@ -1,13 +1,8 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
 
 const Hero = () => {
-  const { user } = useAuth();
-
-  const ctaLink = user ? "/checkout" : "/login";
-
   return (
     <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden">
       {/* Background */}
@@ -42,7 +37,7 @@ const Hero = () => {
 
           {/* CTA */}
           <div className="flex justify-center">
-            <Link to={ctaLink}>
+            <Link to="/mentoria">
               <Button variant="hero" size="xl" className="gap-2">
                 Quero entrar na mentoria
                 <ArrowRight className="w-5 h-5" />
@@ -60,14 +55,18 @@ const Hero = () => {
             </div>
 
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">Atuação real</div>
+              <div className="text-2xl font-bold text-primary">
+                Atuação real
+              </div>
               <div className="text-sm text-muted-foreground">
                 Mercado futuro
               </div>
             </div>
 
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">Método</div>
+              <div className="text-2xl font-bold text-primary">
+                Método
+              </div>
               <div className="text-sm text-muted-foreground">
                 Validado na prática
               </div>

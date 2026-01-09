@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -15,7 +16,10 @@ import LessonPage from "./pages/Lesson";
 import Checkout from "./pages/Checkout";
 import ThankYou from "./pages/ThankYou";
 import FAQ from "./pages/FAQ";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
+
 import ProBot from "./components/ProBot";
 
 const queryClient = new QueryClient();
@@ -27,16 +31,26 @@ const App = () => (
       <Sonner />
 
       <BrowserRouter>
-        {/* ✅ RESPONSÁVEL PELO SCROLL */}
+        {/* 🔝 Scroll automático ao trocar de rota */}
         <ScrollToTop />
 
         <AuthProvider>
           <Routes>
+            {/* ================= PÚBLICAS ================= */}
             <Route path="/" element={<Index />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/faq" element={<FAQ />} />
 
-            {/* DASHBOARD */}
+            {/* ================= INSTITUCIONAIS ================= */}
+            <Route path="/termos" element={<Terms />} />
+            <Route path="/privacidade" element={<Privacy />} />
+
+            {/* ================= CHECKOUT ================= */}
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/obrigado" element={<ThankYou />} />
+
+            {/* ================= PROTEGIDAS ================= */}
             <Route
               path="/dashboard"
               element={
@@ -46,7 +60,6 @@ const App = () => (
               }
             />
 
-            {/* PÁGINA DA AULA */}
             <Route
               path="/aula/:id"
               element={
@@ -56,15 +69,11 @@ const App = () => (
               }
             />
 
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/obrigado" element={<ThankYou />} />
-            <Route path="/faq" element={<FAQ />} />
-
-            {/* 404 */}
+            {/* ================= 404 ================= */}
             <Route path="*" element={<NotFound />} />
           </Routes>
 
-          {/* Bot flutuante */}
+          {/* 🤖 Bot flutuante */}
           <ProBot />
         </AuthProvider>
       </BrowserRouter>
