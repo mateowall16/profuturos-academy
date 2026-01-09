@@ -9,13 +9,13 @@ import CTA from "@/components/CTA";
 
 const Index = () => {
   useEffect(() => {
-    // 🔹 Title (aba do navegador)
+    // 🔹 Título da aba
     document.title =
-      "Mentoria ProFuturos | Aprenda Cripto do Zero com Método";
+      "JFN Trading Academy | Mentoria em Cripto do Zero ao Profissional";
 
-    // 🔹 Meta description (SEO / Ads)
+    // 🔹 Meta description (SEO / Ads / Google)
     const description =
-      "Aprenda a operar o mercado futuro de criptomoedas com método, gestão de risco e acompanhamento real. Mentoria prática para iniciantes.";
+      "Aprenda a operar o mercado futuro de criptomoedas com método, gestão de risco e acompanhamento real. Mentoria prática para iniciantes e traders em evolução.";
 
     let meta = document.querySelector<HTMLMetaElement>(
       'meta[name="description"]'
