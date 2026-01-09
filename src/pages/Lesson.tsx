@@ -1,165 +1,201 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { CheckCircle } from "lucide-react";
+import clsx from "clsx";
 
 type Lesson = {
   id: number;
-  module_id: number;
   title: string;
-  description: string | null;
-  video_url: string;
+  embedUrl: string;
 };
 
-export default function LessonPage() {
-  const { id } = useParams<{ id: string }>();
-  const lessonId = Number(id);
+const lessons: Lesson[] = [
+  {
+    id: 1,
+    title: "Apresentação da Mentoria",
+    embedUrl:
+      "https://drive.google.com/file/d/1ANxz2tgNhdM3hNxW9l_0EdEPeDhHPp5I/preview",
+  },
+  {
+    id: 2,
+    title: "TradingView + Futuros na Teoria",
+    embedUrl:
+      "https://drive.google.com/file/d/1DDr03aWbqb0176RWp4De1CRb_JEV0NMJ/preview",
+  },
+  {
+    id: 3,
+    title: "RSI + Buy & Sell + Revisão",
+    embedUrl:
+      "https://drive.google.com/file/d/1R_bwV8cnWdTgA3mMxD5WWTg9a9nuFbn_/preview",
+  },
+  {
+    id: 4,
+    title: "Binance + Operação ao Vivo",
+    embedUrl:
+      "https://drive.google.com/file/d/1_JzxXQPFbsvEzpNHCaAyEr9Lbu-P5yfk/preview",
+  },
+];
 
-  const { user } = useAuth();
+const LessonPage = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const currentId = Number(id);
+  const lesson = lessons.find((l) => l.id === currentId);
 
-  /* ================= FETCH LESSON ================= */
-  const fetchLesson = async () => {
-    const { data, error } = await supabase
-      .from("lessons")
-      .select("*")
-      .eq("id", lessonId)
-      .single();
+  const completedLessons: number[] = JSON.parse(
+    localStorage.getItem("completed_lessons") || "[]"
+  );
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+  const isCompleted = completedLessons.includes(currentId);
 
-    setLesson(data);
-  };
-
-  /* ================= FETCH MODULE LESSONS ================= */
-  const fetchLessons = async (moduleId: number) => {
-    const { data, error } = await supabase
-      .from("lessons")
-      .select("*")
-      .eq("module_id", moduleId)
-      .order("order_index");
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setLessons(data);
-  };
-
-  /* ================= MARK AS COMPLETED ================= */
-  const markAsCompleted = async () => {
-    if (!user || !lesson) return;
-
-    const { error } = await supabase
-      .from("lesson_progress")
-      .upsert(
-        {
-          user_id: user.id,
-          lesson_id: lesson.id,
-          completed: true,
-          completed_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,lesson_id" }
+  const markAsCompleted = () => {
+    if (!isCompleted) {
+      localStorage.setItem(
+        "completed_lessons",
+        JSON.stringify([...completedLessons, currentId])
       );
-
-    if (error) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível salvar o progresso.",
-        variant: "destructive",
-      });
-      return;
     }
-
-    toast({
-      title: "Aula concluída 🎉",
-      description: "Seu progresso foi salvo.",
-    });
   };
 
-  useEffect(() => {
-    if (!lessonId) return;
-
-    fetchLesson();
-  }, [lessonId]);
-
-  useEffect(() => {
-    if (lesson?.module_id) {
-      fetchLessons(lesson.module_id);
-    }
-  }, [lesson]);
+  const nextLesson = lessons.find((l) => l.id === currentId + 1);
 
   if (!lesson) {
-    return <div className="p-8">Carregando aula...</div>;
+    return (
+      <div className="container py-20 text-center">
+        <p className="text-muted-foreground">Aula não encontrada.</p>
+        <Link to="/dashboard">
+          <Button className="mt-4">Voltar ao dashboard</Button>
+        </Link>
+      </div>
+    );
   }
 
-  /* ================= UI ================= */
   return (
-    <div className="flex min-h-screen">
-      {/* SIDEBAR */}
-      <aside className="w-80 border-r bg-muted/30 p-4 hidden md:block">
-        <h2 className="font-semibold mb-4">Aulas do módulo</h2>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* HEADER */}
+      <header className="border-b border-border bg-card">
+        <div className="container h-16 flex items-center justify-between">
+          <Link
+            to="/dashboard"
+            className="text-sm text-muted-foreground hover:text-primary"
+          >
+            ← Voltar para o dashboard
+          </Link>
 
-        <ul className="space-y-2">
-          {lessons.map((l) => (
-            <li
-              key={l.id}
-              onClick={() => navigate(`/aula/${l.id}`)}
-              className={`cursor-pointer rounded px-3 py-2 text-sm transition
-                ${
-                  l.id === lesson.id
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                }`}
-            >
-              {l.title}
-            </li>
-          ))}
-        </ul>
-      </aside>
+          <span className="text-sm text-muted-foreground">
+            Módulo 0 — Início
+          </span>
+        </div>
+      </header>
 
       {/* CONTEÚDO */}
-      <main className="flex-1 p-6 max-w-5xl mx-auto">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="text-sm text-muted-foreground mb-4"
-        >
-          ← Voltar para o curso
-        </button>
+      <main className="container py-8 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
+        {/* PLAYER + INFO */}
+        <section className="space-y-6">
+          {/* PLAYER */}
+          <div className="relative aspect-video rounded-xl overflow-hidden bg-black">
+            <iframe
+              src={lesson.embedUrl}
+              className="w-full h-full"
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            />
+          </div>
 
-        <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
+          {/* INFO */}
+          <div>
+            <h1 className="font-display text-2xl font-bold mb-1">
+              {lesson.title}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Aula focada em aprendizado prático e direto ao ponto.
+            </p>
+          </div>
 
-        {/* PLAYER */}
-        <div className="aspect-video bg-black rounded overflow-hidden mb-6">
-          <iframe
-            src={lesson.video_url}
-            className="w-full h-full"
-            allow="autoplay; fullscreen"
-            allowFullScreen
-            title={lesson.title}
-          />
-        </div>
+          {/* AÇÕES */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={markAsCompleted}
+            >
+              Marcar como concluída
+            </Button>
 
-        {lesson.description && (
-          <p className="text-muted-foreground mb-6">
-            {lesson.description}
-          </p>
-        )}
+            {isCompleted && (
+              <div className="flex items-center gap-2 text-green-500 text-sm">
+                <CheckCircle className="w-5 h-5" />
+                Aula concluída
+              </div>
+            )}
+          </div>
+        </section>
 
-        <Button onClick={markAsCompleted}>
-          Concluir aula
-        </Button>
+        {/* SIDEBAR */}
+        <aside className="bg-card border border-border rounded-xl p-4 space-y-4">
+          <div>
+            <h3 className="font-semibold text-sm">
+              Módulo 0 — Início
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {lessons.length} aulas
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            {lessons.map((item) => {
+              const active = item.id === currentId;
+              const completed = completedLessons.includes(item.id);
+
+              return (
+                <Link
+                  key={item.id}
+                  to={`/aula/${item.id}`}
+                  className={clsx(
+                    "flex items-center gap-3 p-2 rounded-lg border transition",
+                    active
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/40"
+                  )}
+                >
+                  <div className="w-10 h-10 flex items-center justify-center rounded bg-muted">
+                    {completed ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <span className="text-sm font-semibold">
+                        {item.id}
+                      </span>
+                    )}
+                  </div>
+
+                  <span className="text-sm line-clamp-2">
+                    {item.title}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {nextLesson && (
+            <Button
+              className="w-full"
+              onClick={() => navigate(`/aula/${nextLesson.id}`)}
+            >
+              Ir para a próxima aula
+            </Button>
+          )}
+        </aside>
       </main>
+
+      {/* FOOTER */}
+      <footer className="border-t border-border py-6">
+        <div className="container text-center text-sm text-muted-foreground">
+          © ProFuturos Academy — Todos os direitos reservados
+        </div>
+      </footer>
     </div>
   );
-}
+};
+
+export default LessonPage;
