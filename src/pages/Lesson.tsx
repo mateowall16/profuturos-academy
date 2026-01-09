@@ -7,16 +7,10 @@ import { useToast } from "@/hooks/use-toast";
 
 type Lesson = {
   id: number;
+  module_id: number;
   title: string;
   description: string | null;
   video_url: string;
-};
-
-type Document = {
-  id: number;
-  title: string;
-  file_url: string;
-  type: "pdf" | "sheet" | "link";
 };
 
 export default function LessonPage() {
@@ -28,56 +22,54 @@ export default function LessonPage() {
   const { toast } = useToast();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
 
   /* ================= FETCH LESSON ================= */
   const fetchLesson = async () => {
     const { data, error } = await supabase
       .from("lessons")
-      .select("id, title, description, video_url")
+      .select("*")
       .eq("id", lessonId)
       .single();
 
     if (error) {
-      console.error("Erro ao buscar aula:", error);
+      console.error(error);
       return;
     }
 
     setLesson(data);
   };
 
-  /* ================= FETCH DOCUMENTS ================= */
-  const fetchDocuments = async () => {
+  /* ================= FETCH MODULE LESSONS ================= */
+  const fetchLessons = async (moduleId: number) => {
     const { data, error } = await supabase
-      .from("lesson_documents")
-      .select("id, title, file_url, type")
-      .eq("lesson_id", lessonId);
+      .from("lessons")
+      .select("*")
+      .eq("module_id", moduleId)
+      .order("order_index");
 
     if (error) {
-      console.error("Erro ao buscar documentos:", error);
+      console.error(error);
       return;
     }
 
-    setDocuments(data);
+    setLessons(data);
   };
 
   /* ================= MARK AS COMPLETED ================= */
   const markAsCompleted = async () => {
-    if (!user) return;
+    if (!user || !lesson) return;
 
     const { error } = await supabase
       .from("lesson_progress")
       .upsert(
         {
           user_id: user.id,
-          lesson_id: lessonId,
+          lesson_id: lesson.id,
           completed: true,
           completed_at: new Date().toISOString(),
         },
-        {
-          onConflict: "user_id,lesson_id",
-        }
+        { onConflict: "user_id,lesson_id" }
       );
 
     if (error) {
@@ -91,81 +83,83 @@ export default function LessonPage() {
 
     toast({
       title: "Aula concluída 🎉",
-      description: "Seu progresso foi salvo com sucesso.",
+      description: "Seu progresso foi salvo.",
     });
   };
 
   useEffect(() => {
     if (!lessonId) return;
 
-    Promise.all([fetchLesson(), fetchDocuments()]).finally(() =>
-      setLoading(false)
-    );
+    fetchLesson();
   }, [lessonId]);
 
-  if (loading) {
-    return <div className="p-8">Carregando aula...</div>;
-  }
+  useEffect(() => {
+    if (lesson?.module_id) {
+      fetchLessons(lesson.module_id);
+    }
+  }, [lesson]);
 
   if (!lesson) {
-    return <div className="p-8">Aula não encontrada</div>;
+    return <div className="p-8">Carregando aula...</div>;
   }
 
   /* ================= UI ================= */
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <button
-        onClick={() => navigate(-1)}
-        className="text-sm text-muted-foreground mb-4"
-      >
-        ← Voltar para o curso
-      </button>
+    <div className="flex min-h-screen">
+      {/* SIDEBAR */}
+      <aside className="w-80 border-r bg-muted/30 p-4 hidden md:block">
+        <h2 className="font-semibold mb-4">Aulas do módulo</h2>
 
-      <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
+        <ul className="space-y-2">
+          {lessons.map((l) => (
+            <li
+              key={l.id}
+              onClick={() => navigate(`/aula/${l.id}`)}
+              className={`cursor-pointer rounded px-3 py-2 text-sm transition
+                ${
+                  l.id === lesson.id
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+            >
+              {l.title}
+            </li>
+          ))}
+        </ul>
+      </aside>
 
-      {/* PLAYER */}
-      <div className="aspect-video mb-6 bg-black rounded overflow-hidden">
-        <iframe
-          src={lesson.video_url}
-          className="w-full h-full"
-          allow="autoplay; fullscreen"
-          allowFullScreen
-          title={lesson.title}
-        />
-      </div>
+      {/* CONTEÚDO */}
+      <main className="flex-1 p-6 max-w-5xl mx-auto">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="text-sm text-muted-foreground mb-4"
+        >
+          ← Voltar para o curso
+        </button>
 
-      {/* DESCRIÇÃO */}
-      {lesson.description && (
-        <p className="text-muted-foreground mb-6">
-          {lesson.description}
-        </p>
-      )}
+        <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
 
-      {/* DOCUMENTOS */}
-      {documents.length > 0 && (
-        <div className="mb-6">
-          <h2 className="font-semibold mb-2">Materiais da aula</h2>
-          <ul className="space-y-2">
-            {documents.map((doc) => (
-              <li key={doc.id}>
-                <a
-                  href={doc.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline"
-                >
-                  {doc.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+        {/* PLAYER */}
+        <div className="aspect-video bg-black rounded overflow-hidden mb-6">
+          <iframe
+            src={lesson.video_url}
+            className="w-full h-full"
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            title={lesson.title}
+          />
         </div>
-      )}
 
-      {/* CONCLUIR */}
-      <Button onClick={markAsCompleted}>
-        Concluir aula
-      </Button>
+        {lesson.description && (
+          <p className="text-muted-foreground mb-6">
+            {lesson.description}
+          </p>
+        )}
+
+        <Button onClick={markAsCompleted}>
+          Concluir aula
+        </Button>
+      </main>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Mentoria from "./pages/Mentoria";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import LessonPage from "./pages/Lesson";
 import Checkout from "./pages/Checkout";
 import ThankYou from "./pages/ThankYou";
 import FAQ from "./pages/FAQ";
@@ -35,11 +36,22 @@ const App = () => (
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/login" element={<Login />} />
 
+            {/* DASHBOARD */}
             <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* PÁGINA DA AULA */}
+            <Route
+              path="/aula/:id"
+              element={
+                <ProtectedRoute>
+                  <LessonPage />
                 </ProtectedRoute>
               }
             />
