@@ -41,7 +41,7 @@ export type Database = {
         Relationships: []
       }
 
-      /* ================= MODULES ================= */
+      /* ================= OLD MODULES (LEGADO) ================= */
       modules: {
         Row: {
           id: number
@@ -74,7 +74,7 @@ export type Database = {
         Relationships: []
       }
 
-      /* ================= USER_PROGRESS ================= */
+      /* ================= OLD USER_PROGRESS (LEGADO) ================= */
       user_progress: {
         Row: {
           id: number
@@ -94,6 +94,114 @@ export type Database = {
           module_id?: number
           completed?: boolean
           created_at?: string
+        }
+        Relationships: []
+      }
+
+      /* ================= COURSE MODULES (NOVO) ================= */
+      course_modules: {
+        Row: {
+          id: number
+          title: string
+          type: "recorded" | "live"
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          title: string
+          type: "recorded" | "live"
+          order_index: number
+          created_at?: string
+        }
+        Update: {
+          title?: string
+          type?: "recorded" | "live"
+          order_index?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+
+      /* ================= LESSONS (NOVO) ================= */
+      lessons: {
+        Row: {
+          id: number
+          module_id: number
+          title: string
+          description: string | null
+          video_url: string
+          duration_seconds: number
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          module_id: number
+          title: string
+          description?: string | null
+          video_url: string
+          duration_seconds: number
+          order_index: number
+          created_at?: string
+        }
+        Update: {
+          module_id?: number
+          title?: string
+          description?: string | null
+          video_url?: string
+          duration_seconds?: number
+          order_index?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+
+      /* ================= LESSON DOCUMENTS (NOVO) ================= */
+      lesson_documents: {
+        Row: {
+          id: number
+          lesson_id: number
+          title: string
+          file_url: string
+          type: "pdf" | "sheet" | "link"
+          created_at: string
+        }
+        Insert: {
+          lesson_id: number
+          title: string
+          file_url: string
+          type: "pdf" | "sheet" | "link"
+          created_at?: string
+        }
+        Update: {
+          lesson_id?: number
+          title?: string
+          file_url?: string
+          type?: "pdf" | "sheet" | "link"
+          created_at?: string
+        }
+        Relationships: []
+      }
+
+      /* ================= LESSON PROGRESS (NOVO) ================= */
+      lesson_progress: {
+        Row: {
+          id: number
+          user_id: string
+          lesson_id: number
+          completed: boolean
+          completed_at: string | null
+        }
+        Insert: {
+          user_id: string
+          lesson_id: number
+          completed?: boolean
+          completed_at?: string | null
+        }
+        Update: {
+          user_id?: string
+          lesson_id?: number
+          completed?: boolean
+          completed_at?: string | null
         }
         Relationships: []
       }
