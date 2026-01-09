@@ -1,67 +1,107 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+
+/* =======================
+   TYPES
+======================= */
 
 type Lesson = {
   id: number;
   title: string;
-  description: string;
-  image: string;
+  description: string | null;
+  order_index: number;
 };
 
-const lessons: Lesson[] = [
-  {
-    id: 1,
-    title: "1- Apresentação da Mentoria",
-    description: "Boas-vindas e visão geral do método",
-    image:
-      "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200",
-  },
-  {
-    id: 2,
-    title: "2- TradingView + Futuros na Teoria",
-    description: "Plataforma, conceitos e base teórica",
-    image:
-      "https://images.unsplash.com/photo-1642790106117-e829e14a795f?q=80&w=1200",
-  },
-  {
-    id: 3,
-    title: "3- RSI + Buy & Sell + Revisão",
-    description: "Indicadores técnicos e tomada de decisão",
-    image:
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1200",
-  },
-  {
-    id: 4,
-    title: "4- Binance + Operação ao Vivo",
-    description: "Execução prática no mercado real",
-    image:
-      "https://images.unsplash.com/photo-1621761191319-c6fb62004040?q=80&w=1200",
-  },
-];
+type LessonProgress = {
+  lesson_id: number;
+  completed: boolean;
+};
+
+/* =======================
+   HELPERS
+======================= */
+
+// imagem temporária baseada na ordem (até ter thumbnail no banco)
+const lessonImages: Record<number, string> = {
+  1: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200",
+  2: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?q=80&w=1200",
+  3: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1200",
+  4: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?q=80&w=1200",
+};
+
+/* =======================
+   COMPONENT
+======================= */
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, user } = useAuth();
+
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [progress, setProgress] = useState<LessonProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  /* =======================
+     LOAD DATA
+  ======================= */
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadData = async () => {
+      setLoading(true);
+
+      const { data: lessonsData } = await supabase
+        .from("lessons")
+        .select("id, title, description, order_index")
+        .order("order_index");
+
+      const { data: progressData } = await supabase
+        .from("lesson_progress")
+        .select("lesson_id, completed")
+        .eq("user_id", user.id);
+
+      setLessons(lessonsData || []);
+      setProgress(progressData || []);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut();
     navigate("/login", { replace: true });
   };
 
-  // 🧠 Segurança extra: evita render sem profile
-  if (!profile) {
+  if (!profile || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground">Carregando painel...</p>
-        </div>
+        <p className="text-muted-foreground">Carregando dashboard...</p>
       </div>
     );
   }
+
+  /* =======================
+     DERIVED DATA
+  ======================= */
+
+  const completedIds = progress
+    .filter((p) => p.completed)
+    .map((p) => p.lesson_id);
+
+  const nextLesson =
+    lessons.find((l) => !completedIds.includes(l.id)) || lessons[0];
+
+  const progressPercent =
+    lessons.length > 0
+      ? Math.round((completedIds.length / lessons.length) * 100)
+      : 0;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -89,15 +129,22 @@ const Dashboard = () => {
             </h1>
 
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Esta mentoria foi criada para te ensinar, de forma clara e prática,
-              como operar no mercado futuro utilizando análise técnica,
-              gerenciamento de risco e execução profissional — mesmo que você
-              esteja começando do zero.
+              Seu progresso é salvo automaticamente. Continue exatamente de onde
+              parou.
             </p>
 
-            <Link to="/aula/1">
-              <Button size="lg">Continuar assistindo</Button>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Button
+                size="lg"
+                onClick={() => navigate(`/aula/${nextLesson.id}`)}
+              >
+                ▶️ Continuar aula
+              </Button>
+
+              <span className="text-sm text-muted-foreground">
+                {progressPercent}% concluído
+              </span>
+            </div>
           </div>
 
           <div className="relative">
@@ -119,35 +166,49 @@ const Dashboard = () => {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {lessons.map((lesson) => (
-            <Card
-              key={lesson.id}
-              className="group overflow-hidden border-border hover:border-primary/50 transition"
-            >
-              <div
-                className="h-40 bg-cover bg-center"
-                style={{ backgroundImage: `url(${lesson.image})` }}
+          {lessons.map((lesson) => {
+            const completed = completedIds.includes(lesson.id);
+
+            return (
+              <Card
+                key={lesson.id}
+                className="group overflow-hidden border-border hover:border-primary/50 transition"
               >
-                <div className="h-full w-full bg-black/40 group-hover:bg-black/20 transition" />
-              </div>
-
-              <CardContent className="p-5">
-                <div className="space-y-2 mb-5">
-                  <h3 className="font-display font-semibold">
-                    {lesson.title}
-                  </h3>
-
-                  <p className="text-sm text-muted-foreground">
-                    {lesson.description}
-                  </p>
+                <div
+                  className="h-40 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${
+                      lessonImages[lesson.order_index] ||
+                      lessonImages[1]
+                    })`,
+                  }}
+                >
+                  <div className="h-full w-full bg-black/40 group-hover:bg-black/20 transition" />
                 </div>
 
-                <Link to={`/aula/${lesson.id}`}>
-                  <Button className="w-full">Assistir aula</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
+                <CardContent className="p-5">
+                  <div className="space-y-2 mb-5">
+                    <h3 className="font-display font-semibold">
+                      {lesson.order_index}. {lesson.title}
+                    </h3>
+
+                    <p className="text-sm text-muted-foreground">
+                      {lesson.description ||
+                        "Aula focada em aprendizado prático e direto ao ponto."}
+                    </p>
+                  </div>
+
+                  <Button
+                    className="w-full"
+                    variant={completed ? "outline" : "default"}
+                    onClick={() => navigate(`/aula/${lesson.id}`)}
+                  >
+                    {completed ? "Rever aula" : "Assistir aula"}
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </section>
 

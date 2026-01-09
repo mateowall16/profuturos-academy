@@ -1,78 +1,97 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, PlayCircle, FileText } from "lucide-react";
 import clsx from "clsx";
-
-type LessonResource = {
-  title: string;
-  url: string;
-};
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 type Lesson = {
   id: number;
   title: string;
-  embedUrl: string;
-  resources?: LessonResource[];
+  video_url: string;
+  order_index: number;
 };
 
-const lessons: Lesson[] = [
-  {
-    id: 1,
-    title: "Apresentação da Mentoria",
-    embedUrl:
-      "https://drive.google.com/file/d/1ANxz2tgNhdM3hNxW9l_0EdEPeDhHPp5I/preview",
-  },
-  {
-    id: 2,
-    title: "TradingView + Futuros na Teoria",
-    embedUrl:
-      "https://drive.google.com/file/d/1DDr03aWbqb0176RWp4De1CRb_JEV0NMJ/preview",
-  },
-  {
-    id: 3,
-    title: "RSI + Buy & Sell + Revisão",
-    embedUrl:
-      "https://drive.google.com/file/d/1R_bwV8cnWdTgA3mMxD5WWTg9a9nuFbn_/preview",
-      
-  },
-  {
-    id: 4,
-    title: "Binance + Operação ao Vivo",
-    embedUrl:
-      "https://drive.google.com/file/d/1_JzxXQPFbsvEzpNHCaAyEr9Lbu-P5yfk/preview",
-    resources: [
-      {
-        title: "Guia Completo de Futuros (PDF)",
-        url: "/materiais/guia-de-futuros.pdf",
-      },
-    ],
-  },
-];
+type LessonProgress = {
+  lesson_id: number;
+  completed: boolean;
+};
 
 const LessonPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [progress, setProgress] = useState<LessonProgress[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const currentId = Number(id);
-  const lesson = lessons.find((l) => l.id === currentId);
 
-  const completedLessons: number[] = JSON.parse(
-    localStorage.getItem("completed_lessons") || "[]"
-  );
+  /* =======================
+     LOAD DATA
+  ======================= */
+  useEffect(() => {
+    if (!user) return;
+
+    const loadData = async () => {
+      setLoading(true);
+
+      const { data: lessonsData } = await supabase
+        .from("lessons")
+        .select("id, title, video_url, order_index")
+        .order("order_index");
+
+      const { data: progressData } = await supabase
+        .from("lesson_progress")
+        .select("lesson_id, completed")
+        .eq("user_id", user.id);
+
+      setLessons(lessonsData || []);
+      setProgress(progressData || []);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando aula...</p>
+      </div>
+    );
+  }
+
+  const lesson = lessons.find((l) => l.id === currentId);
+  const completedLessons = progress.filter((p) => p.completed).map((p) => p.lesson_id);
 
   const isCompleted = completedLessons.includes(currentId);
-  const nextLesson = lessons.find((l) => l.id === currentId + 1);
+  const nextLesson = lessons.find((l) => l.order_index === lesson?.order_index + 1);
 
   const progressPercent = Math.round(
     (completedLessons.length / lessons.length) * 100
   );
 
-  const markAsCompleted = () => {
-    if (isCompleted) return;
-    localStorage.setItem(
-      "completed_lessons",
-      JSON.stringify([...completedLessons, currentId])
-    );
+  /* =======================
+     ACTIONS
+  ======================= */
+
+  const markAsCompleted = async () => {
+    if (!user || isCompleted) return;
+
+    await supabase.from("lesson_progress").upsert({
+      user_id: user.id,
+      lesson_id: currentId,
+      completed: true,
+      completed_at: new Date().toISOString(),
+    });
+
+    setProgress((prev) => [
+      ...prev,
+      { lesson_id: currentId, completed: true },
+    ]);
   };
 
   if (!lesson) {
@@ -110,7 +129,7 @@ const LessonPage = () => {
         <section className="space-y-6">
           <div className="relative aspect-video rounded-xl overflow-hidden bg-black">
             <iframe
-              src={lesson.embedUrl}
+              src={lesson.video_url}
               className="w-full h-full"
               allow="autoplay; fullscreen"
               allowFullScreen
@@ -128,11 +147,7 @@ const LessonPage = () => {
 
           {/* AÇÕES */}
           <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <Button
-              size="lg"
-              onClick={markAsCompleted}
-              disabled={isCompleted}
-            >
+            <Button size="lg" onClick={markAsCompleted} disabled={isCompleted}>
               {isCompleted ? "Aula concluída" : "Marcar como concluída"}
             </Button>
 
@@ -143,41 +158,13 @@ const LessonPage = () => {
               </div>
             )}
           </div>
-
-          {/* 📎 MATERIAIS DA AULA */}
-<div className="border border-border rounded-xl p-4 space-y-3 bg-card">
-  <h3 className="font-semibold text-sm">
-    Materiais da aula
-  </h3>
-
-  {lesson.resources && lesson.resources.length > 0 ? (
-    lesson.resources.map((res, index) => (
-      <a
-        key={index}
-        href={res.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary transition"
-      >
-        <FileText className="w-5 h-5 text-primary" />
-        <span className="text-sm">{res.title}</span>
-      </a>
-    ))
-  ) : (
-    <p className="text-sm text-muted-foreground">
-      Nenhum material disponível para esta aula.
-    </p>
-  )}
-</div>
         </section>
 
         {/* SIDEBAR */}
         <aside className="bg-card border border-border rounded-xl p-4 space-y-4 h-fit lg:sticky lg:top-24">
           {/* PROGRESSO */}
           <div>
-            <h3 className="font-semibold text-sm">
-              Módulo 0 — Início
-            </h3>
+            <h3 className="font-semibold text-sm">Módulo 0 — Início</h3>
 
             <div className="w-full h-2 bg-muted rounded overflow-hidden mt-2">
               <div
@@ -192,7 +179,7 @@ const LessonPage = () => {
           </div>
 
           {/* LISTA DE AULAS */}
-          <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+          <div className="space-y-2">
             {lessons.map((item) => {
               const active = item.id === currentId;
               const completed = completedLessons.includes(item.id);
@@ -215,7 +202,7 @@ const LessonPage = () => {
                       <PlayCircle className="w-5 h-5 text-primary" />
                     ) : (
                       <span className="text-sm font-semibold">
-                        {item.id}
+                        {item.order_index}
                       </span>
                     )}
                   </div>

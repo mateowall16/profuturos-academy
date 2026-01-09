@@ -1,8 +1,13 @@
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const CTA = () => {
+  const { user } = useAuth();
+
+  const ctaLink = user ? "/checkout" : "/login";
+
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
       {/* Background */}
@@ -18,16 +23,15 @@ const CTA = () => {
 
         {/* Subheadline */}
         <p className="text-lg text-muted-foreground mb-10">
-          Você não precisa de experiência, nem de muito tempo disponível.
-          Precisa apenas de um método claro, acompanhamento e disciplina.
-          É exatamente isso que você encontra na mentoria.
+          Mesmo começando do zero, você aprende com método, acompanhamento
+          e gestão de risco para operar com mais segurança e clareza.
         </p>
 
         {/* CTA */}
         <div className="flex justify-center mb-6">
-          <Link to="/mentoria">
+          <Link to={ctaLink}>
             <Button variant="hero" size="xl" className="gap-2">
-              Entrar para a mentoria agora
+              Quero entrar na mentoria
               <ArrowRight className="w-5 h-5" />
             </Button>
           </Link>

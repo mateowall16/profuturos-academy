@@ -1,9 +1,14 @@
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import mentorAvatar from "/imagens/mentor-avatar.jpeg";
 
 const Mentor = () => {
+  const { user } = useAuth();
+
+  const ctaLink = user ? "/checkout" : "/login";
+
   return (
     <section className="py-20 md:py-32">
       <div className="container mx-auto px-4">
@@ -13,11 +18,10 @@ const Mentor = () => {
           <div className="relative">
             <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
             <img
-  src={mentorAvatar}
-  alt="Julia Jesus - Mentora"
-  className="relative w-full max-w-md mx-auto rounded-2xl shadow-card"
-/>
-
+              src={mentorAvatar}
+              alt="Julia Jesus - Mentora"
+              className="relative w-full max-w-md mx-auto rounded-2xl shadow-card"
+            />
           </div>
 
           {/* Conteúdo */}
@@ -41,22 +45,25 @@ const Mentor = () => {
             {/* Lista de autoridade */}
             <ul className="space-y-3 mb-8">
               {[
-                "Mais de 300 alunos acompanhados",
-                "Atuação real no mercado de futuros",
-                "Método simples e validado na prática",
-                "Foco em proteção de capital e consistência",
+                "Mais de 300 alunos acompanhados de perto",
+                "Atuação real e diária no mercado futuro",
+                "Método simples, replicável e validado na prática",
+                "Foco total em proteção de capital e consistência",
               ].map((item, index) => (
-                <li key={index} className="flex items-center gap-3 text-foreground">
+                <li
+                  key={index}
+                  className="flex items-center gap-3 text-foreground"
+                >
                   <CheckCircle className="w-5 h-5 text-primary" />
-                  {item}
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
 
             {/* CTA */}
-            <Link to="/mentoria">
+            <Link to={ctaLink}>
               <Button variant="hero" size="lg" className="gap-2">
-                Conhecer a mentoria
+                Quero entrar na mentoria
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
