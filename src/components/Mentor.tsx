@@ -1,7 +1,6 @@
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import mentorAvatar from "@/Imagens/mentor-avatar.jpg.jpeg";
 
 const Mentor = () => {
   return (
@@ -13,7 +12,7 @@ const Mentor = () => {
           <div className="relative">
             <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
             <img
-              src={mentorAvatar}
+              src="public/imagens/mentor-avatar.jpeg"
               alt="Julia Jesus - Mentora"
               className="relative w-full max-w-md mx-auto rounded-2xl shadow-card"
             />

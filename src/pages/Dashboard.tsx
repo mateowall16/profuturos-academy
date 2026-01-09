@@ -87,7 +87,7 @@ const Dashboard = () => {
           <div className="relative">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 to-transparent z-10" />
             <img
-              src="src\Imagens\mentor-avatar.jpg.jpeg"
+              src="public/imagens/mentor-avatar.jpeg"
               className="rounded-2xl object-cover w-full h-[320px] md:h-[380px]"
   style={{ objectPosition: "30% 75%" }}
             />
