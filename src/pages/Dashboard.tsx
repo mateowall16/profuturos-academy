@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/hooks/useAuth";
 
 type Lesson = {
   id: number;
@@ -42,17 +43,14 @@ const lessons: Lesson[] = [
 ];
 
 const Dashboard = () => {
-  const userName = localStorage.getItem("user_name") || "Aluno";
   const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
 
-  const handleLogout = () => {
-    // limpa sessão
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("user_name");
-    localStorage.removeItem("completed_lessons");
+  const handleLogout = async () => {
+    await signOut();
 
-    // redireciona para início/login
-    navigate("/");
+    // 🔒 Sai explicitamente da área protegida
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -79,7 +77,7 @@ const Dashboard = () => {
           {/* TEXTO */}
           <div>
             <h1 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              Bem-vindo, {userName}
+              Bem-vindo, {profile?.full_name || "Aluno"}
             </h1>
 
             <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -94,7 +92,7 @@ const Dashboard = () => {
             </Link>
           </div>
 
-          {/* FOTO DA JULIA */}
+          {/* FOTO */}
           <div className="relative">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 to-transparent z-10" />
             <img
@@ -127,31 +125,29 @@ const Dashboard = () => {
               </div>
 
               <CardContent className="p-5">
-  <div className="space-y-2 mb-5">
-    <h3 className="font-display font-semibold">
-      {lesson.title}
-    </h3>
+                <div className="space-y-2 mb-5">
+                  <h3 className="font-display font-semibold">
+                    {lesson.title}
+                  </h3>
 
-    <p className="text-sm text-muted-foreground">
-      {lesson.description}
-    </p>
-  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {lesson.description}
+                  </p>
+                </div>
 
-  <Link to={`/aula/${lesson.id}`}>
-    <Button className="w-full">
-      Assistir aula
-    </Button>
-  </Link>
-</CardContent>
-
+                <Link to={`/aula/${lesson.id}`}>
+                  <Button className="w-full">Assistir aula</Button>
+                </Link>
+              </CardContent>
             </Card>
           ))}
         </div>
       </section>
 
       {/* FOOTER */}
-   <Footer/>
+      <Footer />
     </div>
   );
 };
+
 export default Dashboard;
