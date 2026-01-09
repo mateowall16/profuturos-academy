@@ -1,7 +1,7 @@
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import mentorAvatar from "public/imagens/mentor-avatar.jpeg";
+import mentorAvatar from "/imagens/mentor-avatar.jpeg";
 
 const Mentor = () => {
   return (
