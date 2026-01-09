@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   /* =======================
-     LOAD PROFILE
+     LOAD PROFILE (CORRETO)
   ======================= */
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase
       .from("profiles")
       .select("full_name, has_access")
-      .eq("user_id", user.id)
+      .eq("id", user.id) // ✅ CORRETO: profiles.id = auth.users.id
       .single()
       .then(({ data, error }) => {
         if (error || !data) {

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -8,24 +7,46 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout = () => {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleCheckout = () => {
-    setLoading(true);
+  const handleCheckout = async () => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
 
-    setTimeout(() => {
-      localStorage.setItem("hasAccess", "true");
-      navigate("/checkout/success");
-    }, 3000);
+    try {
+      setLoading(true);
+
+      // ⏳ simula processamento de pagamento
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ has_access: true })
+        .eq("id", user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // 🔄 força reload para sincronizar profile + ProtectedRoute
+      window.location.href = "/dashboard";
+    } catch (err) {
+      console.error("Erro ao liberar acesso:", err);
+      alert("Não foi possível liberar o acesso. Tente novamente.");
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-start">
-
         {/* COLUNA ESQUERDA */}
         <div className="space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold">
@@ -53,17 +74,11 @@ const Checkout = () => {
           </ul>
 
           <div className="rounded-lg border p-4 bg-card">
-            <p className="font-semibold mb-1">
-              🔒 Garantia incondicional
-            </p>
+            <p className="font-semibold mb-1">🔒 Garantia incondicional</p>
             <p className="text-sm text-muted-foreground">
               Se em até 7 dias você achar que não é para você,
               basta pedir reembolso.
             </p>
-          </div>
-
-          <div className="text-sm text-muted-foreground">
-            Pagamento processado com segurança
           </div>
         </div>
 
@@ -105,7 +120,6 @@ const Checkout = () => {
             </p>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

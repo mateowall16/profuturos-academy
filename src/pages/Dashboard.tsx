@@ -48,17 +48,26 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     await signOut();
-
-    // 🔒 Sai explicitamente da área protegida
     navigate("/login", { replace: true });
   };
+
+  // 🧠 Segurança extra: evita render sem profile
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground">Carregando painel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* HEADER */}
       <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="container flex h-16 items-center justify-between">
-          {/* LOGO */}
           <div className="text-xl font-bold tracking-widest text-primary">
             JFN
           </div>
@@ -74,10 +83,9 @@ const Dashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent" />
 
         <div className="container relative py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* TEXTO */}
           <div>
             <h1 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              Bem-vindo, {profile?.full_name || "Aluno"}
+              Bem-vindo, {profile.full_name || "Aluno"}
             </h1>
 
             <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -92,7 +100,6 @@ const Dashboard = () => {
             </Link>
           </div>
 
-          {/* FOTO */}
           <div className="relative">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 to-transparent z-10" />
             <img
@@ -144,7 +151,6 @@ const Dashboard = () => {
         </div>
       </section>
 
-      {/* FOOTER */}
       <Footer />
     </div>
   );
