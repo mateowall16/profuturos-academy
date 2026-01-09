@@ -1,0 +1,1289 @@
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\Checkout.tsx =====
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Check, Lock } from "lucide-react";
+
+const Checkout = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    setLoading(true);
+
+    setTimeout(() => {
+      localStorage.setItem("hasAccess", "true");
+      navigate("/checkout/success");
+    }, 3000);
+  };
+
+  return (
+    <div className="min-h-screen bg-background py-16 px-4">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-start">
+
+        {/* COLUNA ESQUERDA */}
+        <div className="space-y-6">
+          <h1 className="text-3xl md:text-4xl font-bold">
+            Mentoria ProFuturos
+          </h1>
+
+          <p className="text-muted-foreground text-lg">
+            Aprenda a operar mercado futuro com método, gestão de risco
+            e acompanhamento real.
+          </p>
+
+          <ul className="space-y-3">
+            {[
+              "Acesso completo à plataforma",
+              "Aulas gravadas + lives semanais",
+              "Grupo fechado de alunos",
+              "Gestão de risco profissional",
+              "Atualizações contínuas",
+            ].map((item, i) => (
+              <li key={i} className="flex items-center gap-2">
+                <Check className="w-5 h-5 text-primary" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="rounded-lg border p-4 bg-card">
+            <p className="font-semibold mb-1">
+              🔒 Garantia incondicional
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Se em até 7 dias você achar que não é para você,
+              basta pedir reembolso.
+            </p>
+          </div>
+
+          <div className="text-sm text-muted-foreground">
+            Pagamento processado com segurança
+          </div>
+        </div>
+
+        {/* COLUNA DIREITA */}
+        <Card className="sticky top-10">
+          <CardHeader>
+            <CardTitle>Resumo da compra</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="flex justify-between items-center">
+              <span>Mentoria ProFuturos</span>
+              <span className="font-semibold">R$ 497,00</span>
+            </div>
+
+            <div className="border-t pt-4 flex justify-between text-lg font-bold">
+              <span>Total</span>
+              <span>R$ 497,00</span>
+            </div>
+
+            <Button
+              size="xl"
+              className="w-full gap-2"
+              onClick={handleCheckout}
+              disabled={loading}
+            >
+              {loading ? (
+                "Processando pagamento..."
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  Finalizar compra
+                </>
+              )}
+            </Button>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Ao finalizar, você concorda com nossos termos de uso
+            </p>
+          </CardContent>
+        </Card>
+
+      </div>
+    </div>
+  );
+};
+
+export default Checkout;
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\Dashboard.tsx =====
+
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+type CourseModule = {
+  id: number;
+  title: string;
+  type: "recorded" | "live";
+};
+
+type Lesson = {
+  id: number;
+  module_id: number;
+  title: string;
+  duration_seconds: number;
+};
+
+export default function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const [modules, setModules] = useState<CourseModule[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+
+  /* ================= FETCH MODULES ================= */
+  const fetchModules = async () => {
+    const { data, error } = await supabase
+      .from("course_modules")
+      .select("id, title, type")
+      .order("order_index");
+
+    if (error) {
+      console.error("Erro ao buscar módulos:", error);
+      return;
+    }
+
+    setModules(data);
+  };
+
+  /* ================= FETCH LESSONS ================= */
+  const fetchLessons = async () => {
+    const { data, error } = await supabase
+      .from("lessons")
+      .select("id, module_id, title, duration_seconds")
+      .order("order_index");
+
+    if (error) {
+      console.error("Erro ao buscar aulas:", error);
+      return;
+    }
+
+    setLessons(data);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchModules();
+    fetchLessons();
+  }, [user]);
+
+  /* ================= UI ================= */
+  return (
+    <div className="container mx-auto max-w-5xl py-8">
+      <h1 className="text-2xl font-bold mb-6">Mentoria Pro Futuros</h1>
+
+      {modules.map((module) => (
+        <div key={module.id} className="mb-6 border rounded-lg p-4">
+          <h2 className="font-semibold text-lg mb-2">
+            {module.title}
+          </h2>
+
+          <ul className="space-y-2">
+            {lessons
+              .filter((lesson) => lesson.module_id === module.id)
+              .map((lesson) => (
+                <li
+                  key={lesson.id}
+                  className="flex justify-between items-center cursor-pointer hover:underline"
+                  onClick={() => navigate(`/aula/${lesson.id}`)}
+                >
+                  <span>{lesson.title}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {Math.floor(lesson.duration_seconds / 60)}:
+                    {(lesson.duration_seconds % 60)
+                      .toString()
+                      .padStart(2, "0")}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\FAQ.tsx =====
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Mail, Send } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { useToast } from "@/hooks/use-toast";
+
+const FAQ = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const { toast } = useToast();
+
+  const faqs = [
+    {
+      question: "Preciso ter experiência com criptomoedas?",
+      answer:
+        "Não. A mentoria foi criada justamente para quem está começando do zero. Você aprende desde os conceitos básicos até a execução prática, sempre com foco em clareza e gestão de risco.",
+    },
+    {
+      question: "Vou perder dinheiro operando?",
+      answer:
+        "Todo mercado envolve risco. O foco da mentoria é ensinar gestão de risco, controle emocional e tomada de decisão consciente — nunca prometer ganhos fáceis.",
+    },
+    {
+      question: "A mentoria é sinal de trade?",
+      answer:
+        "Não. Você aprende a analisar o mercado e tomar suas próprias decisões. O objetivo é autonomia, não dependência de sinais.",
+    },
+    {
+      question: "Quanto tempo por dia preciso dedicar?",
+      answer:
+        "Em média, de 30 minutos a 1 hora por dia. A mentoria foi pensada para quem trabalha ou estuda e não pode ficar o dia inteiro na frente do gráfico.",
+    },
+    {
+      question: "As aulas ficam gravadas?",
+      answer:
+        "Sim. Todas as aulas ficam gravadas e disponíveis na plataforma para você assistir no seu ritmo, quantas vezes quiser.",
+    },
+    {
+      question: "Existe acompanhamento ou suporte?",
+      answer:
+        "Sim. Você terá acesso a um grupo fechado de alunos e acompanhamento contínuo para tirar dúvidas e evoluir com mais segurança.",
+    },
+    {
+      question: "Existe algum tipo de garantia?",
+      answer:
+        "Você tem um prazo inicial para conhecer a metodologia e decidir com tranquilidade se a mentoria faz sentido para você.",
+    },
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Mensagem enviada!",
+      description: "Entraremos em contato em breve.",
+    });
+    setFormData({ name: "", email: "", message: "" });
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      {/* Hero */}
+      <section className="pt-24 pb-16 md:pt-32 md:pb-24">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Perguntas <span className="text-primary">Frequentes</span>
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Tire suas dúvidas sobre a mentoria e entenda se ela faz sentido para
+            você começar com mais segurança.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="pb-16 md:pb-24">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="bg-card border border-border rounded-xl px-6 data-[state=open]:border-primary/50"
+              >
+                <AccordionTrigger className="text-left text-foreground font-medium py-4 hover:text-primary">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-4">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          {/* CTA */}
+          <div className="text-center mt-16">
+            <p className="text-lg text-muted-foreground mb-6">
+              Se essas respostas fizeram sentido para você, o próximo passo é
+              aprender com acompanhamento.
+            </p>
+
+            <Button variant="hero" size="lg" asChild>
+              <a href="/mentoria">Quero entrar para a mentoria</a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* CONTATO */}
+      <section
+        id="contato"
+        className="py-16 md:py-24 bg-card/50 scroll-mt-24"
+      >
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Fale <span className="text-primary">Conosco</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Ainda ficou alguma dúvida? Entre em contato.
+            </p>
+          </div>
+
+          <div className="max-w-xl mx-auto">
+            <div className="p-6 rounded-xl bg-card border border-border">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Seu nome"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message">Mensagem</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    placeholder="Escreva sua mensagem..."
+                    rows={5}
+                    value={formData.message}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <Button type="submit" variant="hero" className="w-full">
+                  Enviar mensagem
+                  <Send className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
+
+            <p className="text-center text-muted-foreground mt-8">
+              <Mail className="w-4 h-4 inline mr-2" />
+              contato@JFNTrading.com
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default FAQ;
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\Index.tsx =====
+
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
+import Mentor from "@/components/Mentor";
+import Testimonials from "@/components/Testimonials";
+import CTA from "@/components/CTA";
+
+const Index = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <Hero />
+      <Features />
+      <Mentor />
+      <Testimonials />
+      <CTA />
+      <Footer />
+    </div>
+  );
+};
+
+export default Index;
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\Lesson.tsx =====
+
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
+type Lesson = {
+  id: number;
+  module_id: number;
+  title: string;
+  description: string | null;
+  video_url: string;
+};
+
+export default function LessonPage() {
+  const { id } = useParams<{ id: string }>();
+  const lessonId = Number(id);
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+
+  /* ================= FETCH LESSON ================= */
+  const fetchLesson = async () => {
+    const { data, error } = await supabase
+      .from("lessons")
+      .select("*")
+      .eq("id", lessonId)
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setLesson(data);
+  };
+
+  /* ================= FETCH MODULE LESSONS ================= */
+  const fetchLessons = async (moduleId: number) => {
+    const { data, error } = await supabase
+      .from("lessons")
+      .select("*")
+      .eq("module_id", moduleId)
+      .order("order_index");
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setLessons(data);
+  };
+
+  /* ================= MARK AS COMPLETED ================= */
+  const markAsCompleted = async () => {
+    if (!user || !lesson) return;
+
+    const { error } = await supabase
+      .from("lesson_progress")
+      .upsert(
+        {
+          user_id: user.id,
+          lesson_id: lesson.id,
+          completed: true,
+          completed_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,lesson_id" }
+      );
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar o progresso.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Aula concluída 🎉",
+      description: "Seu progresso foi salvo.",
+    });
+  };
+
+  useEffect(() => {
+    if (!lessonId) return;
+
+    fetchLesson();
+  }, [lessonId]);
+
+  useEffect(() => {
+    if (lesson?.module_id) {
+      fetchLessons(lesson.module_id);
+    }
+  }, [lesson]);
+
+  if (!lesson) {
+    return <div className="p-8">Carregando aula...</div>;
+  }
+
+  /* ================= UI ================= */
+  return (
+    <div className="flex min-h-screen">
+      {/* SIDEBAR */}
+      <aside className="w-80 border-r bg-muted/30 p-4 hidden md:block">
+        <h2 className="font-semibold mb-4">Aulas do módulo</h2>
+
+        <ul className="space-y-2">
+          {lessons.map((l) => (
+            <li
+              key={l.id}
+              onClick={() => navigate(`/aula/${l.id}`)}
+              className={`cursor-pointer rounded px-3 py-2 text-sm transition
+                ${
+                  l.id === lesson.id
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+            >
+              {l.title}
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      {/* CONTEÚDO */}
+      <main className="flex-1 p-6 max-w-5xl mx-auto">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="text-sm text-muted-foreground mb-4"
+        >
+          ← Voltar para o curso
+        </button>
+
+        <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
+
+        {/* PLAYER */}
+        <div className="aspect-video bg-black rounded overflow-hidden mb-6">
+          <iframe
+            src={lesson.video_url}
+            className="w-full h-full"
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            title={lesson.title}
+          />
+        </div>
+
+        {lesson.description && (
+          <p className="text-muted-foreground mb-6">
+            {lesson.description}
+          </p>
+        )}
+
+        <Button onClick={markAsCompleted}>
+          Concluir aula
+        </Button>
+      </main>
+    </div>
+  );
+}
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\Login.tsx =====
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { TrendingUp, Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import Logo from "@/components/Logo";
+
+const Login = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { signIn, signUp, user, loading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate("/dashboard");
+    }
+  }, [user, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos para continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isSignUp && !fullName) {
+      toast({
+        title: "Nome obrigatório",
+        description: "Digite seu nome completo para criar a conta.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(email, password, fullName);
+        if (error) {
+          if (error.message.includes("already registered")) {
+            toast({
+              title: "E-mail já cadastrado",
+              description: "Este e-mail já está em uso. Tente fazer login.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Erro no cadastro",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+        } else {
+          toast({
+            title: "Conta criada!",
+            description: "Bem-vindo à JFN Trading Academy.",
+          });
+          navigate("/dashboard");
+        }
+      } else {
+        const { error } = await signIn(email, password);
+        if (error) {
+          toast({
+            title: "Credenciais inválidas",
+            description: "E-mail ou senha incorretos. Tente novamente.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login realizado!",
+            description: "Bem-vindo de volta à JFN Trading Academy.",
+          });
+          navigate("/dashboard");
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Logo */}
+       
+       <div className="flex justify-center mb-8">
+  <Logo size="lg" />
+</div>
+
+
+        {/* Card */}
+        <div className="bg-card border border-border rounded-2xl p-8 shadow-[0_4px_24px_hsl(0_0%_0%/0.3)]">
+          <div className="text-center mb-8">
+            <h1 className="font-display text-2xl font-bold text-foreground mb-2">
+              {isSignUp ? "Criar Conta" : "Área do Aluno"}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {isSignUp 
+                ? "Crie sua conta para acessar o conteúdo exclusivo."
+                : "Faça login para acessar suas aulas e materiais exclusivos."
+              }
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-foreground">
+                  Nome completo
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Seu nome completo"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10 bg-secondary border-border focus:border-primary"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-foreground">
+                E-mail
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 bg-secondary border-border focus:border-primary"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-foreground">
+                Senha
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 pr-10 bg-secondary border-border focus:border-primary"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {!isSignUp && (
+              <div className="text-right">
+                <a href="#" className="text-sm text-primary hover:underline">
+                  Esqueci minha senha
+                </a>
+              </div>
+            )}
+
+            <Button 
+              type="submit" 
+              variant="hero" 
+              className="w-full" 
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  {isSignUp ? "Criar conta" : "Entrar"}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Toggle between login and signup */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              {isSignUp ? "Já tem uma conta?" : "Não tem uma conta?"}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="ml-1 text-primary hover:underline font-medium"
+              >
+                {isSignUp ? "Fazer login" : "Criar conta"}
+              </button>
+            </p>
+          </div>
+        </div>
+
+        <p className="text-center text-muted-foreground text-sm mt-6">
+          <Link to="/" className="hover:text-primary transition-colors">
+            ← Voltar para o início
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\Mentoria.tsx =====
+
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+
+const Mentoria = () => {
+  return (
+    <>
+      <Header />
+
+      {/* ================= HERO ================= */}
+      <section className="pt-32 pb-28 bg-background">
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <span className="inline-block mb-6 px-4 py-1 text-sm font-medium rounded-full bg-primary/10 text-primary">
+            Mentoria em Mercado Futuro
+          </span>
+
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
+            Aprenda a operar no mercado de futuros com{" "}
+            <span className="text-primary">
+              método, gestão de risco e acompanhamento
+            </span>
+          </h1>
+
+          <p className="text-muted-foreground text-lg md:text-xl mb-10">
+            Uma mentoria prática para quem quer parar de operar no achismo,
+            entender o mercado e evoluir com mais clareza e responsabilidade.
+          </p>
+
+          <Button size="lg" variant="hero" asChild>
+            <a href="/checkout">Entrar para a mentoria</a>
+          </Button>
+
+          <p className="mt-4 text-sm text-muted-foreground">
+            Sem promessas irreais • Conteúdo estruturado • Acesso imediato
+          </p>
+        </div>
+      </section>
+
+      {/* ================= O PROBLEMA ================= */}
+      <section className="py-28 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-8">
+            Por que a maioria das pessoas{" "}
+            <span className="text-primary">perde dinheiro</span> no mercado?
+          </h2>
+
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            Não é falta de inteligência. É falta de método, gestão de risco e
+            controle emocional. Sem um caminho claro, o iniciante pula de
+            estratégia em estratégia, opera por impulso e toma decisões sem
+            contexto.
+          </p>
+        </div>
+      </section>
+
+      {/* ================= PARA QUEM É ================= */}
+      <section className="py-28 bg-card/50">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-14">
+            Essa mentoria é <span className="text-primary">para você</span> se:
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-10 text-lg">
+            <ul className="space-y-4 text-muted-foreground">
+              <li>✔️ Está começando do zero no mercado cripto</li>
+              <li>✔️ Já tentou operar e se sentiu perdido</li>
+              <li>✔️ Quer aprender gestão de risco de verdade</li>
+              <li>✔️ Busca autonomia, não sinais prontos</li>
+            </ul>
+
+            <ul className="space-y-4 text-muted-foreground">
+              <li>❌ Não é para quem busca lucro rápido</li>
+              <li>❌ Não é promessa de dinheiro fácil</li>
+              <li>❌ Não é robô ou fórmula mágica</li>
+              <li>❌ Não é aposta</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= O QUE VOCÊ VAI APRENDER ================= */}
+      <section className="py-28 bg-background">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-14">
+            O que você vai <span className="text-primary">aprender</span>
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-10 text-lg text-muted-foreground">
+            <ul className="space-y-4">
+              <li>📌 Fundamentos do mercado futuro</li>
+              <li>📌 Funcionamento da Binance Futures</li>
+              <li>📌 Leitura de gráfico e contexto</li>
+              <li>📌 Estratégias com lógica clara</li>
+            </ul>
+
+            <ul className="space-y-4">
+              <li>📌 Gestão de risco aplicada</li>
+              <li>📌 Controle emocional</li>
+              <li>📌 Disciplina operacional</li>
+              <li>📌 Construção de plano de trade</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= COMO FUNCIONA ================= */}
+      <section className="py-28 bg-card/50">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-14">
+            Como funciona a <span className="text-primary">mentoria</span>
+          </h2>
+
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            {[
+              {
+                title: "Acesso",
+                text: "Entre na plataforma e acesse a área do aluno.",
+              },
+              {
+                title: "Aulas",
+                text: "Consuma o conteúdo no seu ritmo, quando quiser.",
+              },
+              {
+                title: "Comunidade",
+                text: "Participe do grupo fechado de alunos.",
+              },
+              {
+                title: "Evolução",
+                text: "Aprenda com acompanhamento e método.",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-xl bg-background border border-border"
+              >
+                <p className="text-lg font-semibold mb-2">{item.title}</p>
+                <p className="text-muted-foreground">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+{/* ================= GARANTIA / RISCO ZERO ================= */}
+<section className="py-28 bg-card/50">
+  <div className="container mx-auto px-4 max-w-4xl">
+    <div className="rounded-2xl border border-border bg-background p-10 text-center shadow-sm">
+      <span className="inline-block mb-4 px-4 py-1 text-sm font-medium rounded-full bg-primary/10 text-primary">
+        Garantia de Tranquilidade
+      </span>
+
+      <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
+        Entre com <span className="text-primary">segurança</span> e tranquilidade
+      </h2>
+
+      <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+        Você terá um período inicial para conhecer a metodologia, entender como
+        funciona a mentoria e decidir com calma se ela realmente faz sentido para
+        você.
+      </p>
+
+      <p className="text-muted-foreground text-lg leading-relaxed mb-10">
+        A proposta aqui não é prender ninguém, mas oferecer um ambiente sério,
+        responsável e estruturado para quem quer aprender de verdade.
+      </p>
+
+      <div className="flex flex-col md:flex-row gap-4 justify-center text-sm text-muted-foreground">
+        <span>✔️ Sem promessas irreais</span>
+        <span>✔️ Método claro e estruturado</span>
+        <span>✔️ Decisão consciente</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+      {/* ================= CTA FINAL ================= */}
+      <section className="py-32 bg-background">
+        <div className="container mx-auto px-4 text-center max-w-3xl">
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
+            Aprender com método é melhor do que tentar sozinho
+          </h2>
+
+          <p className="text-muted-foreground text-lg mb-10">
+            Dê o próximo passo com mais clareza, responsabilidade e
+            acompanhamento.
+          </p>
+
+          <Button size="lg" variant="hero" asChild>
+            <a href="/checkout">Acessar a mentoria agora</a>
+          </Button>
+
+          <p className="mt-6 text-sm text-muted-foreground">
+            Acesso imediato • Conteúdo contínuo • Suporte ao aluno
+          </p>
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+};
+
+export default Mentoria;
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\NotFound.tsx =====
+
+import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Home, ArrowLeft } from "lucide-react";
+
+const NotFound = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+  }, [location.pathname]);
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative text-center max-w-md">
+        <div className="text-9xl font-display font-bold text-primary/20 mb-4">
+          404
+        </div>
+        <h1 className="font-display text-3xl font-bold text-foreground mb-4">
+          Página Não Encontrada
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          A página que você está procurando não existe ou foi movida para outro endereço.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/">
+            <Button variant="hero" size="lg">
+              <Home className="w-4 h-4" />
+              Voltar ao Início
+            </Button>
+          </Link>
+          <Button variant="outline" size="lg" onClick={() => window.history.back()}>
+            <ArrowLeft className="w-4 h-4" />
+            Voltar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NotFound;
+
+
+===== FILE: C:\Users\mateo\Documents\Projetos\profuturos-academy\src\pages\ThankYou.tsx =====
+
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, ArrowRight, Mail, MessageCircle, TrendingUp } from "lucide-react";
+import confetti from "canvas-confetti";
+import { useEffect } from "react";
+
+const ThankYou = () => {
+  useEffect(() => {
+    // Trigger confetti on mount
+    const duration = 3 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: NodeJS.Timeout = setInterval(function () {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        colors: ["#00C46B", "#00a85a", "#ffffff"],
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        colors: ["#00C46B", "#00a85a", "#ffffff"],
+      });
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const nextSteps = [
+    {
+      icon: Mail,
+      title: "E-mail de Boas-Vindas Enviado",
+      description: "Você receberá: 'Bem-vindo à Mentoria JFN Trading 🚀 — Seu acesso foi liberado. Comece pelo módulo 1: Introdução aos Futuros.'",
+    },
+    {
+      icon: TrendingUp,
+      title: "Acesse a plataforma",
+      description: "Faça login na área do aluno para começar a estudar agora mesmo.",
+    },
+    {
+      icon: MessageCircle,
+      title: "Entre no Grupo VIP do WhatsApp",
+      description: "Participe das discussões, tire dúvidas e conecte-se com outros traders.",
+      isWhatsApp: true,
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+      </div>
+
+      <div className="relative w-full max-w-2xl text-center">
+        {/* Success Icon */}
+        <div className="mb-8 animate-scale-in">
+          <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mx-auto shadow-[0_0_60px_hsl(153_100%_39%/0.3)]">
+            <CheckCircle className="w-12 h-12 text-primary" />
+          </div>
+        </div>
+
+        {/* Message */}
+        <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4 animate-fade-up">
+          Parabéns! Você garantiu seu acesso <span className="text-primary">🎉</span>
+        </h1>
+
+        <p className="text-lg text-muted-foreground mb-8 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+          Seu acesso à Mentoria Binance Pro foi confirmado. Verifique seu e-mail com os detalhes e comece pelo módulo 1.
+        </p>
+
+        {/* Next Steps */}
+        <div className="bg-card rounded-2xl border border-border p-6 md:p-8 mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+          <h2 className="font-display text-xl font-semibold text-foreground mb-6">
+            Próximos Passos
+          </h2>
+
+          <div className="space-y-4">
+            {nextSteps.map((step, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-4 p-4 rounded-lg bg-secondary/50 border border-border/50 text-left"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <step.icon className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-foreground">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  {step.isWhatsApp && (
+                    <a
+                      href="https://wa.me/5511999999999"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Acessar Grupo VIP 👉
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
+          <Link to="/dashboard">
+            <Button variant="hero" size="xl">
+              Ir para área do aluno
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </Link>
+        </div>
+
+        {/* Support */}
+        <p className="text-sm text-muted-foreground mt-8 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+          Dúvidas? Entre em contato:{" "}
+          <a href="mailto:suporte@JFN Trading.com.br" className="text-primary hover:underline">
+            suporte@JFN Trading.com.br
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default ThankYou;
+

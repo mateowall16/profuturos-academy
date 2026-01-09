@@ -1,0 +1,13 @@
+Stack:
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- Shadcn/UI
+- React Router DOM
+
+Regras:
+- Não usar Redux
+- Não usar backend neste projeto
+- Estado simples (hooks)
+- UI sempre baseada em componentes reutilizáveis
+- Estilo via Tailwind

@@ -1,0 +1,17 @@
+Projeto: ProFuturos Academy
+
+Descrição:
+Plataforma frontend para mentoria sobre mercado futuro.
+O acesso é liberado após checkout bem-sucedido.
+
+Objetivos principais:
+- Checkout
+- Área de conteúdo
+- Controle de acesso simples via localStorage
+- UX limpa e profissional
+
+Público:
+Alunos pagantes de mentoria
+
+Status:
+MVP funcional em evolução
