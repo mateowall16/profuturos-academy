@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import Footer from "@/components/Footer";
 
 type Lesson = {
   id: number;
@@ -42,23 +43,33 @@ const lessons: Lesson[] = [
 
 const Dashboard = () => {
   const userName = localStorage.getItem("user_name") || "Aluno";
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // limpa sessão
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("completed_lessons");
+
+    // redireciona para início/login
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* HEADER */}
       <header className="sticky top-0 z-50 bg-card border-b border-border">
-  <div className="container flex h-16 items-center justify-between">
-    {/* LOGO */}
-    <div className="text-xl font-bold tracking-widest text-primary">
-      JFN
-    </div>
+        <div className="container flex h-16 items-center justify-between">
+          {/* LOGO */}
+          <div className="text-xl font-bold tracking-widest text-primary">
+            JFN
+          </div>
 
-    <Button variant="outline" size="sm">
-      Sair
-    </Button>
-  </div>
-</header>
-
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            Sair
+          </Button>
+        </div>
+      </header>
 
       {/* HERO */}
       <section className="relative overflow-hidden">
@@ -87,9 +98,10 @@ const Dashboard = () => {
           <div className="relative">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 to-transparent z-10" />
             <img
-              src="public/imagens/mentor-avatar.jpeg"
+              src="/imagens/mentor-avatar.jpeg"
+              alt="Mentora"
               className="rounded-2xl object-cover w-full h-[320px] md:h-[380px]"
-  style={{ objectPosition: "30% 75%" }}
+              style={{ objectPosition: "30% 75%" }}
             />
           </div>
         </div>
@@ -114,33 +126,32 @@ const Dashboard = () => {
                 <div className="h-full w-full bg-black/40 group-hover:bg-black/20 transition" />
               </div>
 
-              <CardContent className="p-5 space-y-3">
-                <h3 className="font-display font-semibold">
-                  {lesson.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {lesson.description}
-                </p>
+              <CardContent className="p-5">
+  <div className="space-y-2 mb-5">
+    <h3 className="font-display font-semibold">
+      {lesson.title}
+    </h3>
 
-                <Link to={`/aula/${lesson.id}`}>
-                  <Button className="w-full">
-                    Assistir aula
-                  </Button>
-                </Link>
-              </CardContent>
+    <p className="text-sm text-muted-foreground">
+      {lesson.description}
+    </p>
+  </div>
+
+  <Link to={`/aula/${lesson.id}`}>
+    <Button className="w-full">
+      Assistir aula
+    </Button>
+  </Link>
+</CardContent>
+
             </Card>
           ))}
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-border py-6 mt-12">
-        <div className="container text-center text-sm text-muted-foreground">
-          © JFN — Todos os direitos reservados
-        </div>
-      </footer>
+   <Footer/>
     </div>
   );
 };
-
 export default Dashboard;

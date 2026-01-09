@@ -19,6 +19,7 @@ export type Database = {
           user_id: string
           full_name: string | null
           email: string | null
+          has_access: boolean | null
           created_at: string
           updated_at: string
         }
@@ -27,6 +28,7 @@ export type Database = {
           user_id: string
           full_name?: string | null
           email?: string | null
+          has_access?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -35,6 +37,7 @@ export type Database = {
           user_id?: string
           full_name?: string | null
           email?: string | null
+          has_access?: boolean | null
           created_at?: string
           updated_at?: string
         }

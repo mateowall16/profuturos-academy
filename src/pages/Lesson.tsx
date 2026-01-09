@@ -1,12 +1,18 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, PlayCircle, FileText } from "lucide-react";
 import clsx from "clsx";
+
+type LessonResource = {
+  title: string;
+  url: string;
+};
 
 type Lesson = {
   id: number;
   title: string;
   embedUrl: string;
+  resources?: LessonResource[];
 };
 
 const lessons: Lesson[] = [
@@ -27,12 +33,19 @@ const lessons: Lesson[] = [
     title: "RSI + Buy & Sell + Revisão",
     embedUrl:
       "https://drive.google.com/file/d/1R_bwV8cnWdTgA3mMxD5WWTg9a9nuFbn_/preview",
+      
   },
   {
     id: 4,
     title: "Binance + Operação ao Vivo",
     embedUrl:
       "https://drive.google.com/file/d/1_JzxXQPFbsvEzpNHCaAyEr9Lbu-P5yfk/preview",
+    resources: [
+      {
+        title: "Guia Completo de Futuros (PDF)",
+        url: "/materiais/guia-de-futuros.pdf",
+      },
+    ],
   },
 ];
 
@@ -48,17 +61,19 @@ const LessonPage = () => {
   );
 
   const isCompleted = completedLessons.includes(currentId);
+  const nextLesson = lessons.find((l) => l.id === currentId + 1);
+
+  const progressPercent = Math.round(
+    (completedLessons.length / lessons.length) * 100
+  );
 
   const markAsCompleted = () => {
-    if (!isCompleted) {
-      localStorage.setItem(
-        "completed_lessons",
-        JSON.stringify([...completedLessons, currentId])
-      );
-    }
+    if (isCompleted) return;
+    localStorage.setItem(
+      "completed_lessons",
+      JSON.stringify([...completedLessons, currentId])
+    );
   };
-
-  const nextLesson = lessons.find((l) => l.id === currentId + 1);
 
   if (!lesson) {
     return (
@@ -91,9 +106,8 @@ const LessonPage = () => {
 
       {/* CONTEÚDO */}
       <main className="container py-8 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
-        {/* PLAYER + INFO */}
+        {/* PLAYER */}
         <section className="space-y-6">
-          {/* PLAYER */}
           <div className="relative aspect-video rounded-xl overflow-hidden bg-black">
             <iframe
               src={lesson.embedUrl}
@@ -103,7 +117,6 @@ const LessonPage = () => {
             />
           </div>
 
-          {/* INFO */}
           <div>
             <h1 className="font-display text-2xl font-bold mb-1">
               {lesson.title}
@@ -117,33 +130,69 @@ const LessonPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <Button
               size="lg"
-              className="w-full sm:w-auto"
               onClick={markAsCompleted}
+              disabled={isCompleted}
             >
-              Marcar como concluída
+              {isCompleted ? "Aula concluída" : "Marcar como concluída"}
             </Button>
 
             {isCompleted && (
               <div className="flex items-center gap-2 text-green-500 text-sm">
                 <CheckCircle className="w-5 h-5" />
-                Aula concluída
+                Concluída
               </div>
             )}
           </div>
+
+          {/* 📎 MATERIAIS DA AULA */}
+<div className="border border-border rounded-xl p-4 space-y-3 bg-card">
+  <h3 className="font-semibold text-sm">
+    Materiais da aula
+  </h3>
+
+  {lesson.resources && lesson.resources.length > 0 ? (
+    lesson.resources.map((res, index) => (
+      <a
+        key={index}
+        href={res.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary transition"
+      >
+        <FileText className="w-5 h-5 text-primary" />
+        <span className="text-sm">{res.title}</span>
+      </a>
+    ))
+  ) : (
+    <p className="text-sm text-muted-foreground">
+      Nenhum material disponível para esta aula.
+    </p>
+  )}
+</div>
         </section>
 
         {/* SIDEBAR */}
-        <aside className="bg-card border border-border rounded-xl p-4 space-y-4">
+        <aside className="bg-card border border-border rounded-xl p-4 space-y-4 h-fit lg:sticky lg:top-24">
+          {/* PROGRESSO */}
           <div>
             <h3 className="font-semibold text-sm">
               Módulo 0 — Início
             </h3>
-            <p className="text-xs text-muted-foreground">
-              {lessons.length} aulas
+
+            <div className="w-full h-2 bg-muted rounded overflow-hidden mt-2">
+              <div
+                className="h-full bg-primary"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+
+            <p className="text-xs text-muted-foreground mt-1">
+              {progressPercent}% concluído
             </p>
           </div>
 
-          <div className="space-y-2">
+          {/* LISTA DE AULAS */}
+          <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
             {lessons.map((item) => {
               const active = item.id === currentId;
               const completed = completedLessons.includes(item.id);
@@ -162,6 +211,8 @@ const LessonPage = () => {
                   <div className="w-10 h-10 flex items-center justify-center rounded bg-muted">
                     {completed ? (
                       <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : active ? (
+                      <PlayCircle className="w-5 h-5 text-primary" />
                     ) : (
                       <span className="text-sm font-semibold">
                         {item.id}
@@ -177,23 +228,21 @@ const LessonPage = () => {
             })}
           </div>
 
-          {nextLesson && (
+          {/* PRÓXIMA AULA */}
+          {nextLesson ? (
             <Button
               className="w-full"
               onClick={() => navigate(`/aula/${nextLesson.id}`)}
             >
               Ir para a próxima aula
             </Button>
+          ) : (
+            <p className="text-center text-sm text-muted-foreground">
+              🎉 Você concluiu este módulo
+            </p>
           )}
         </aside>
       </main>
-
-      {/* FOOTER */}
-      <footer className="border-t border-border py-6">
-        <div className="container text-center text-sm text-muted-foreground">
-          © ProFuturos Academy — Todos os direitos reservados
-        </div>
-      </footer>
     </div>
   );
 };
